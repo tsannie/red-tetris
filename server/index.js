@@ -17,6 +17,21 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });
+
+  setInterval(() => {
+    socket.emit('updateGame', { time: new Date().toISOString() });
+  }, 1000);
+
+  setInterval(() => {
+    const newPiece = generateNewPiece();
+    socket.emit('newPiece', newPiece);
+  }, 5000);
+
+  function generateNewPiece() {
+    const pieces = ['.'];
+    const randomIndex = Math.floor(Math.random() * pieces.length);
+    return pieces[randomIndex];
+  }
 });
 
 server.listen(4000, () => {

@@ -36,7 +36,6 @@ const Login = () => {
   const handleLogin = () => {
     if (pseudo.trim()) {
       dispatch(setPseudo(pseudo));
-      console.log('Pseudo set');
       navigate('/room');
     }
   };
