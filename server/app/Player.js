@@ -5,6 +5,7 @@ class Player {
     this.score = 0;
     this.board = null;
     this.n_tetriminos = 0;
+    this.tetrimino = null;
   }
 
   updateScore(points) {
