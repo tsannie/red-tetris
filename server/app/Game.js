@@ -1,5 +1,6 @@
-import { TETRIMINOS } from './const';
-import Tetrimino from './Tetrimino';
+import Board from './Board.js';
+import { TETRIMINOS } from './const.js';
+import Tetrimino from './Tetrimino.js';
 
 class Game {
   constructor() {
@@ -28,21 +29,37 @@ class Game {
   }
 
   manageTetriminosPlayers(player) {
-    updateTetriminosHistory();
+    this.updateTetriminosHistory();
     if (player.tetrimino === null) {
       player.tetrimino = new Tetrimino(this.tetriminos_history[player.n_tetriminos]);
+      player.n_tetriminos += 1;
     }
   }
 
   update() {
-    this.players.forEach((player) => {});
+    console.log('update');
+    this.players.forEach((player) => {
+      this.manageTetriminosPlayers(player);
+    });
+    this.players.forEach((player) => {
+      player.socket.emit('update', {
+        board: player.board.gridWithCurrentTetrimino(player.tetrimino),
+        score: player.score,
+        currentTetrimino: player.tetrimino.getShape(),
+        nextTetriminos: this.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2),
+      });
+    });
   }
 
   start(players) {
+    console.log('start');
     this.state = 'STARTED';
     this.players = players;
     this.players.forEach((player) => {
       player.score = 0;
+      player.board = new Board();
+      player.n_tetriminos = 0;
+      player.tetrimino = null;
     });
 
     this.players.forEach((player) => {

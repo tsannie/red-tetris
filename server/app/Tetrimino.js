@@ -1,9 +1,9 @@
-import { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS } from './const';
+import { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS } from './const.js';
 
 class Tetrimino {
   constructor(key) {
     this.shape = TETRIMINOS[key].shape;
-    this.color = color;
+    //this.color = color;
     this.position = [BOARD_WIDTH / 2, BOARD_HEIGHT - Math.ceil(this.shape[0].length / 2)];
     this.rotation = 0;
   }

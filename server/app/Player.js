@@ -1,5 +1,6 @@
 class Player {
-  constructor(socket, pseudo) {
+  constructor(id, pseudo, socket) {
+    this.socket = socket;
     this.id = id;
     this.pseudo = pseudo;
     this.score = 0;
