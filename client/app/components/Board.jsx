@@ -1,12 +1,15 @@
 import React from 'react';
-import Column from './Column';
+import Row from './Row';
 import { useEffect } from 'react';
 import io from 'socket.io-client';
 
-const Board = () => {
-  const columns = Array.from({ length: 10 }, (_, index) => <Column key={index} />);
+const Board = ({ board_value }) => {
+  //console.log('board_value:', board_value);
+  const Rows = board_value.map((row, index) => <Row key={index} row_value={row} />);
 
-  return <div className="flex">{columns}</div>;
+  console.log('Rows:', Rows);
+
+  return <div className="flex flex-col">{Rows}</div>;
 };
 
 export default Board;

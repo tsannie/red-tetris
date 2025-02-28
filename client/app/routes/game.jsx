@@ -3,6 +3,8 @@ import Board from '../components/Board';
 import io from 'socket.io-client';
 
 const Game = () => {
+  const [board, setBoard] = React.useState();
+
   useEffect(() => {
     console.log('Connecting to the server...');
     const socket = io('http://localhost:4000');
@@ -12,6 +14,7 @@ const Game = () => {
     });
 
     socket.on('update', (data) => {
+      setBoard(data.board);
       console.log('Game updated:', data);
     });
 
@@ -24,9 +27,13 @@ const Game = () => {
     };
   }, []);
 
+  if (!board) {
+    return null;
+  }
+
   return (
     <div>
-      <Board />
+      <Board board_value={board} />
     </div>
   );
 };
