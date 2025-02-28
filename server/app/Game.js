@@ -37,8 +37,8 @@ class Game {
   }
 
   update() {
-    console.log('update');
     this.players.forEach((player) => {
+      if (player.tetrimino) player.tetrimino.move([0, 1]);
       this.manageTetriminosPlayers(player);
     });
     this.players.forEach((player) => {
@@ -52,7 +52,6 @@ class Game {
   }
 
   start(players) {
-    console.log('start');
     this.state = 'STARTED';
     this.players = players;
     this.players.forEach((player) => {
@@ -67,7 +66,7 @@ class Game {
     });
     this.interval = setInterval(() => {
       this.update();
-    }, 1000);
+    }, 3000);
   }
 }
 

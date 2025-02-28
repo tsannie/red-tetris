@@ -13,8 +13,8 @@ class Tetrimino {
   }
 
   move(vector) {
-    this.position.x += vector.x;
-    this.position.y += vector.y;
+    this.position[0] += vector[0];
+    this.position[1] += vector[1];
   }
 
   getShape() {
