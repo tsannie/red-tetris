@@ -8,6 +8,15 @@ class Tetrimino {
     this.rotation = 0;
   }
 
+  // Méthode statique pour créer une copie
+  static clone(original) {
+    // Crée une copie profonde des données
+    const copy = structuredClone(original);
+    // Rétablit le prototype pour conserver les méthodes
+    Object.setPrototypeOf(copy, Tetrimino.prototype);
+    return copy;
+  }
+
   rotate() {
     this.rotation = (this.rotation + 1) % this.shape.length;
   }

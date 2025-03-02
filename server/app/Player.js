@@ -1,3 +1,5 @@
+import Tetrimino from "./Tetrimino.js";
+
 class Player {
   constructor(id, pseudo, socket) {
     this.socket = socket;
@@ -11,6 +13,25 @@ class Player {
 
   updateScore(points) {
     this.score += points;
+  }
+
+  move(vector) {
+    let tetrimino_to_test = Tetrimino.clone(this.tetrimino)
+    tetrimino_to_test.move(vector);
+    const number_of_t_before_move = this.board.numberOfTOnGrid(
+      this.board.gridWithCurrentTetrimino(this.tetrimino)
+    );
+    const number_of_t_after_move = this.board.numberOfTOnGrid(
+      this.board.gridWithCurrentTetrimino(tetrimino_to_test)
+    );
+    console.log(number_of_t_after_move, number_of_t_before_move)
+    if (number_of_t_after_move!=number_of_t_before_move){
+      return false
+    }
+    else {
+      this.tetrimino.move(vector)
+      return true
+    }
   }
 }
 

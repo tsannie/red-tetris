@@ -1,5 +1,5 @@
 import Board from './Board.js';
-import { TETRIMINOS } from './const.js';
+import { BOARD_HEIGHT, TETRIMINOS } from './const.js';
 import Tetrimino from './Tetrimino.js';
 
 class Game {
@@ -7,7 +7,7 @@ class Game {
     this.players = [];
     this.state = 'WAITING';
     this.interval = null;
-    this.tetriminos_history = [];
+    this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
   }
 
   getRandomKey() {
@@ -15,11 +15,11 @@ class Game {
     return keys[Math.floor(Math.random() * keys.length)];
   }
 
-  updateTetriminosHistory() {
+  updateTetriminosHistory(player) {
     let n_tetriminos_to_add = 0;
     if (this.tetriminos_history.length === 0) {
       n_tetriminos_to_add = 2;
-    } else if (this.players.n_tetriminos + 2 < this.tetriminos_history.length) {
+    } else if (player.n_tetriminos + 2 > this.tetriminos_history.length) {
       n_tetriminos_to_add = 1;
     }
 
@@ -29,7 +29,7 @@ class Game {
   }
 
   manageTetriminosPlayers(player) {
-    this.updateTetriminosHistory();
+    this.updateTetriminosHistory(player);
     if (player.tetrimino === null) {
       player.tetrimino = new Tetrimino(this.tetriminos_history[player.n_tetriminos]);
       player.n_tetriminos += 1;
@@ -38,12 +38,18 @@ class Game {
 
   update() {
     this.players.forEach((player) => {
-      if (player.tetrimino) player.tetrimino.move([0, 1]);
+      if (player.tetrimino) {
+        console.debug("TETRIMINOS:", player.tetrimino.position)
+        if (player.move([0, 1])) {
+          player.board.keepTetriminoOnBoard(player.tetrimino);
+          player.tetrimino = null;
+        }
+      }
       this.manageTetriminosPlayers(player);
     });
     this.players.forEach((player) => {
       player.socket.emit('update', {
-        board: player.board.gridWithCurrentTetrimino(player.tetrimino),
+        board: player.board.gridWithCurrentTetrimino(player.tetrimino, true),
         score: player.score,
         currentTetrimino: player.tetrimino.getShape(),
         nextTetriminos: this.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2),
@@ -66,7 +72,7 @@ class Game {
     });
     this.interval = setInterval(() => {
       this.update();
-    }, 3000);
+    }, 5000);
   }
 }
 
