@@ -24,7 +24,6 @@ class Player {
     const number_of_t_after_move = this.board.numberOfTOnGrid(
       this.board.gridWithCurrentTetrimino(tetrimino_to_test)
     );
-    console.log(number_of_t_after_move, number_of_t_before_move)
     if (number_of_t_after_move!=number_of_t_before_move){
       return false
     }

@@ -40,7 +40,7 @@ class Game {
     this.players.forEach((player) => {
       if (player.tetrimino) {
         console.debug("TETRIMINOS:", player.tetrimino.position)
-        if (player.move([0, 1])) {
+        if (!player.move([0, 1])) {
           player.board.keepTetriminoOnBoard(player.tetrimino);
           player.tetrimino = null;
         }
@@ -72,7 +72,7 @@ class Game {
     });
     this.interval = setInterval(() => {
       this.update();
-    }, 5000);
+    }, 200);
   }
 }
 
