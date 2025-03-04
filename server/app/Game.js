@@ -72,7 +72,7 @@ class Game {
     });
     this.interval = setInterval(() => {
       this.update();
-    }, 200);
+    }, 5000);
   }
 }
 
