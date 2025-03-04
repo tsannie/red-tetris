@@ -24,6 +24,7 @@ const socketSlice = createSlice({
     },
 
     emitMove: (state, { payload }) => {
+      console.log('emit move', payload);
       state.socket.emit('move', payload);
     },
     emitDrop: (state) => {

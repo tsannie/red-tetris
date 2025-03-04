@@ -15,7 +15,6 @@ const gameServer = new GameServer();
 let room_id = 0;
 
 io.on('connection', (socket) => {
-  
   const userId = generateUniqueUserId();
   console.log('A user connected:', userId);
 
@@ -27,14 +26,12 @@ io.on('connection', (socket) => {
 
   room.startGame();
 
-  socket.on("move", (data) => {
+  socket.on('move', (data) => {
     console.log(`Mouvement reçu: ${data.direction} de user ${userId}`);
-    if (data.direction === "left" & player.move([-1, 0])) console.log("mouvement a gauche accepte");
-    else if ((data.direction === "right") & player.move([1, 0])) console.log("mouvement a gauche accepte");
-    else if ((data.direction === "down") & player.move([0, 1])) console.log("mouvement en bas accepte");
-      // Traitez le mouvement ici, par exemple, mettez à jour l'état du jeu
-      // Puis émettez l'état mis à jour à tous les clients
-      io.emit("gameState", updatedGameState);
+    if ((data.direction === 'left') & player.move([-1, 0])) console.log('mouvement a gauche accepte');
+    else if ((data.direction === 'right') & player.move([1, 0])) console.log('mouvement a gauche accepte');
+    else if ((data.direction === 'down') & player.move([0, 1])) console.log('mouvement en bas accepte');
+    io.emit('gameState', updatedGameState);
   });
 
   socket.on('disconnect', () => {
@@ -48,5 +45,5 @@ server.listen(4000, () => {
 
 function generateUniqueUserId() {
   // Générer un identifiant unique, par exemple, un UUID ou un timestamp
-  return "user-" + Math.random().toString(36).substr(2, 9);
+  return 'user-' + Math.random().toString(36).substr(2, 9);
 }

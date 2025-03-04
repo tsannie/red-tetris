@@ -1,21 +1,22 @@
 import React, { useEffect } from 'react';
 import Board from '../components/Board';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { emitMove } from '../redux/socketSlice';
 
 const Game = () => {
   const socket = useSelector((state) => state.socket);
   const board = useSelector((state) => state.socket.board);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
         case 'ArrowLeft':
-          emitMove('left');
+          dispatch(emitMove('left'));
           break;
         case 'ArrowRight':
           console.log('right');
-          emitMove('right');
+          dispatch(emitMove('right'));
           break;
         case 'ArrowDown':
           socket.emit('move', 'down');
