@@ -1,18 +1,16 @@
 import React, { useEffect } from 'react';
 import Board from '../components/Board';
-import io from 'socket.io-client';
+import { useSelector } from 'react-redux';
 
 const Game = () => {
   const [board, setBoard] = React.useState();
+  const socket = useSelector((state) => state.socket);
 
   useEffect(() => {
-    console.log('Connecting to the server...');
-    const socket = io('http://localhost:4000');
+    console.log('Socket:', socket);
+  }, [socket]);
 
-    socket.on('connect', () => {
-      console.log('Connection established with the server');
-    });
-
+  /*   useEffect(() => {
     socket.on('update', (data) => {
       setBoard(data.board);
       console.log('Game updated:', data);
@@ -25,7 +23,7 @@ const Game = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, []); */
 
   if (!board) {
     return null;

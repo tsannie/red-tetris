@@ -3,6 +3,9 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import stylesheet from './app.css?url';
 import store from './redux/store';
 import { Provider } from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { connectionAttempt } from './redux/socketSlice';
 
 export const links = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -29,7 +32,7 @@ export function Layout({ children }) {
       </head>
       <body>
         <Provider store={store}>
-          <main className="flex items-center justify-center min-h-screen bg-sky-500/100">
+          <main className="flex items-center justify-center min-h-screen bg-red-950">
             {children}
             <ScrollRestoration />
             <Scripts />
@@ -41,6 +44,12 @@ export function Layout({ children }) {
 }
 
 export default function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(connectionAttempt());
+  }, []);
+
   return <Outlet />;
 }
 
