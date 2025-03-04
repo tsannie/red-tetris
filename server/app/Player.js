@@ -29,9 +29,15 @@ class Player {
     }
     else {
       this.tetrimino.move(vector)
+      this.socket.emit('update', {
+        board: this.board.gridWithCurrentTetrimino(this.tetrimino),
+        score: this.score,
+        currentTetrimino: this.tetrimino.getShape(),
+      });
       return true
     }
   }
+
 }
 
 export default Player;
