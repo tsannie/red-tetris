@@ -1,39 +1,52 @@
 import React, { useEffect } from 'react';
 import Board from '../components/Board';
 import { useSelector } from 'react-redux';
+import { emitMove } from '../redux/socketSlice';
 
 const Game = () => {
-  const [board, setBoard] = React.useState();
   const socket = useSelector((state) => state.socket);
+  const board = useSelector((state) => state.socket.board);
 
   useEffect(() => {
-    console.log('Socket:', socket);
-  }, [socket]);
-
-  /*   useEffect(() => {
-    socket.on('update', (data) => {
-      setBoard(data.board);
-      console.log('Game updated:', data);
-    });
-
-    socket.on('newPiece', (data) => {
-      console.log('New piece:', data);
-    });
-
-    return () => {
-      socket.disconnect();
+    const handleKeyDown = (e) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          emitMove('left');
+          break;
+        case 'ArrowRight':
+          console.log('right');
+          emitMove('right');
+          break;
+        case 'ArrowDown':
+          socket.emit('move', 'down');
+          break;
+        case 'ArrowUp':
+          socket.emit('rotate');
+          break;
+        case ' ':
+          socket.emit('drop');
+          break;
+        default:
+          break;
+      }
     };
-  }, []); */
 
-  if (!board) {
-    return null;
+    console.log('Adding event listener');
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  if (!board || !board.length) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <div>
+        <Board board_value={board} />
+      </div>
+    );
   }
-
-  return (
-    <div>
-      <Board board_value={board} />
-    </div>
-  );
 };
 
 export default Game;
