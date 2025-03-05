@@ -1,41 +1,53 @@
 import React, { useEffect } from 'react';
 import Board from '../components/Board';
-import io from 'socket.io-client';
+import { useDispatch, useSelector } from 'react-redux';
+import { emitMove } from '../redux/socketSlice';
 
 const Game = () => {
-  const [board, setBoard] = React.useState();
+  const socket = useSelector((state) => state.socket);
+  const board = useSelector((state) => state.socket.board);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('Connecting to the server...');
-    const socket = io('http://localhost:4000');
+    const handleKeyDown = (e) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          dispatch(emitMove('left'));
+          break;
+        case 'ArrowRight':
+          console.log('right');
+          dispatch(emitMove('right'));
+          break;
+        case 'ArrowDown':
+          socket.emit('move', 'down');
+          break;
+        case 'ArrowUp':
+          socket.emit('rotate');
+          break;
+        case ' ':
+          socket.emit('drop');
+          break;
+        default:
+          break;
+      }
+    };
 
-    socket.on('connect', () => {
-      console.log('Connection established with the server');
-    });
-
-    socket.on('update', (data) => {
-      setBoard(data.board);
-      console.log('Game updated:', data);
-    });
-
-    socket.on('newPiece', (data) => {
-      console.log('New piece:', data);
-    });
-
+    console.log('Adding event listener');
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      socket.disconnect();
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
-  if (!board) {
-    return null;
+  if (!board || !board.length) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <div>
+        <Board board_value={board} />
+      </div>
+    );
   }
-
-  return (
-    <div>
-      <Board board_value={board} />
-    </div>
-  );
 };
 
 export default Game;

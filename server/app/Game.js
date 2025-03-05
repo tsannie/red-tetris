@@ -39,7 +39,7 @@ class Game {
   update() {
     this.players.forEach((player) => {
       if (player.tetrimino) {
-        console.debug("TETRIMINOS:", player.tetrimino.position)
+        console.debug('TETRIMINOS:', player.tetrimino.position);
         if (!player.move([0, 1])) {
           player.board.keepTetriminoOnBoard(player.tetrimino);
           player.tetrimino = null;
