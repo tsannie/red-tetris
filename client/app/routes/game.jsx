@@ -1,7 +1,7 @@
-import React, { use, useEffect } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
-import { emitDrop, emitMove, emitRotate } from '../redux/socketSlice';
+import { emitDrop, emitJoinOrCreateRoom, emitMove, emitRotate } from '../redux/socketSlice';
 import { useLocation } from 'react-router';
 import { login, logout, selectId, selectUsername } from '../redux/userSlice';
 

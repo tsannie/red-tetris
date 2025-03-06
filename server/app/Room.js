@@ -1,8 +1,7 @@
 import Game from './Game.js';
 
 class Room {
-  constructor(id, name, playerAdmin) {
-    this.id = id;
+  constructor(name, playerAdmin) {
     this.name = name;
     this.players = [playerAdmin];
     this.idAdmin = playerAdmin.id;

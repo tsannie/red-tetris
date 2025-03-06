@@ -22,6 +22,9 @@ const socketSlice = createSlice({
       state.socket = null;
     },
 
+    emitJoinOrCreateRoom: (state) => {
+      state = state;
+    },
     emitMove: (state, { payload }) => {
       console.log('payload', payload);
       state.socket.emit('move', payload);
@@ -42,8 +45,17 @@ const socketSlice = createSlice({
   },
 });
 
-export const { connect, connectionAttempt, disconnect, emitMove, emitDrop, emitRotate, emitStart, updateRoom } =
-  socketSlice.actions;
+export const {
+  connect,
+  connectionAttempt,
+  disconnect,
+  emitJoinOrCreateRoom,
+  emitMove,
+  emitDrop,
+  emitRotate,
+  emitStart,
+  updateRoom,
+} = socketSlice.actions;
 
 export const selectIsConnected = (state) => state.socket.socketConnected;
 

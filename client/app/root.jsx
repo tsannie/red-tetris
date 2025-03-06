@@ -14,7 +14,7 @@ import store from './redux/store';
 import { Provider, useSelector } from 'react-redux';
 import { use, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { connectionAttempt, selectIsConnected } from './redux/socketSlice';
+import { connectionAttempt, emitJoinOrCreateRoom, selectIsConnected } from './redux/socketSlice';
 import { login, logout, selectId, selectUsername } from './redux/userSlice';
 
 export const links = () => [
@@ -60,8 +60,23 @@ export default function App() {
   const username = useSelector((state) => selectUsername(state));
   const navigate = useNavigate();
   const socketConnected = useSelector((state) => selectIsConnected(state));
-  const [checkRedirect, setCheckRedirect] = useState(false);
   const regex = /^\/([^\/]+)\/([^\/]+)$/;
+  const [checkRedirect, setCheckRedirect] = useState(false);
+  const [roomJoined, setRoomJoined] = useState(false);
+
+  useEffect(() => {
+    // join or create room
+    if (roomJoined || !socketConnected || location.pathname === '/' || location.pathname === '/room') {
+      return;
+    }
+    if (user_id && username) {
+      const match = location.pathname.match(regex);
+      const room_name = match[1];
+      console.log('user_id:', user_id);
+      dispatch(emitJoinOrCreateRoom({ room_name: room_name, player_id: user_id }));
+      setRoomJoined(true);
+    }
+  }, [socketConnected, username, user_id, location.pathname]);
 
   useEffect(() => {
     if (!user_id && location.pathname === '/room') {
@@ -72,7 +87,7 @@ export default function App() {
       console.log('location.pathname:', location.pathname);
       const match = location.pathname.match(regex);
       console.log('Match:', match);
-      const room_path = match[1];
+      //const room_path = match[1];
       const username_path = match[2];
 
       if (!username || !user_id || username !== username_path) {
@@ -83,7 +98,7 @@ export default function App() {
       }
     }
     setCheckRedirect(true);
-  }, [socketConnected]);
+  }, [socketConnected, location.pathname]);
 
   // check if user as been login
   useEffect(() => {

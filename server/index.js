@@ -12,8 +12,6 @@ const io = new Server(server, {
   },
 });
 const gameServer = new GameServer();
-let room_id = 0;
-
 io.on('connect', (socket) => {
   console.log('Inside connect');
   console.log('A user connected:', socket.id);
@@ -27,6 +25,13 @@ io.on('connect', (socket) => {
   socket.on('logout', (data) => {
     //gameServer.deletePlayer(data.id);
     console.log('A user disconnected:', data);
+  });
+
+  socket.on('joinOrCreateRoom', (data) => {
+    console.log('joinOrCreateRoom:', data);
+
+    //const room = gameServer.createRoom(room_id++, data.roomName, data.playerAdmin);
+    //console.log('room:', room);
   });
 
   socket.on('move', (data) => {
