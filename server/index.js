@@ -26,12 +26,11 @@ io.on('connection', (socket) => {
 
   room.startGame();
 
-  socket.on('move', (data) => {
-    console.log(`Mouvement reçu: ${data.direction} de user ${userId}`);
-    if ((data.direction === 'left') & player.move([-1, 0])) console.log('mouvement a gauche accepte');
-    else if ((data.direction === 'right') & player.move([1, 0])) console.log('mouvement a gauche accepte');
-    else if ((data.direction === 'down') & player.move([0, 1])) console.log('mouvement en bas accepte');
-    io.emit('gameState', updatedGameState);
+  socket.on('move', (direction) => {
+    console.log(`Mouvement reçu: ${direction} de ${userId}`);
+    if ((direction === 'left') && player.move([-1, 0])) console.log('mouvement a gauche accepte');
+    else if ((direction === 'right') && player.move([1, 0])) console.log('mouvement a gauche accepte');
+    else if ((direction === 'down') && player.move([0, 1])) console.log('mouvement en bas accepte');
   });
 
   socket.on('disconnect', () => {
