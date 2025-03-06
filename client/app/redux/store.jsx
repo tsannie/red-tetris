@@ -1,17 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
-import pseudoReducer from './pseudoSlice';
+import pseudoReducer from './userSlice';
 import socketReducer from './socketSlice';
-import socketMiddleware from './socketMiddleware';
+import middleware from './middleware';
 
 const store = configureStore({
   reducer: {
-    pseudo: pseudoReducer,
+    user: pseudoReducer,
     socket: socketReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(socketMiddleware),
+    }).concat(middleware),
 });
 
 export default store;

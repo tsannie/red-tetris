@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { use, useEffect } from 'react';
 import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
-import { emitMove } from '../redux/socketSlice';
+import { emitDrop, emitMove, emitRotate } from '../redux/socketSlice';
+import { useLocation } from 'react-router';
+import { login, logout, selectId, selectUsername } from '../redux/userSlice';
 
 const Game = () => {
-  const socket = useSelector((state) => state.socket);
   const board = useSelector((state) => state.socket.board);
   const dispatch = useDispatch();
 
@@ -19,20 +20,19 @@ const Game = () => {
           dispatch(emitMove('right'));
           break;
         case 'ArrowDown':
-          socket.emit('move', 'down');
+          dispatch(emitMove('down'));
           break;
         case 'ArrowUp':
-          socket.emit('rotate');
+          dispatch(emitRotate());
           break;
         case ' ':
-          socket.emit('drop');
+          dispatch(emitDrop());
           break;
         default:
           break;
       }
     };
 
-    console.log('Adding event listener');
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);

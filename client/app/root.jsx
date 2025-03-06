@@ -1,11 +1,21 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLocation,
+  useNavigate,
+} from 'react-router';
 
 import stylesheet from './app.css?url';
 import store from './redux/store';
-import { Provider } from 'react-redux';
-import { useEffect } from 'react';
+import { Provider, useSelector } from 'react-redux';
+import { use, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { connectionAttempt } from './redux/socketSlice';
+import { connectionAttempt, selectIsConnected } from './redux/socketSlice';
+import { login, logout, selectId, selectUsername } from './redux/userSlice';
 
 export const links = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -45,12 +55,52 @@ export function Layout({ children }) {
 
 export default function App() {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const user_id = useSelector((state) => selectId(state));
+  const username = useSelector((state) => selectUsername(state));
+  const navigate = useNavigate();
+  const socketConnected = useSelector((state) => selectIsConnected(state));
+  const [checkRedirect, setCheckRedirect] = useState(false);
+  const regex = /^\/([^\/]+)\/([^\/]+)$/;
+
+  useEffect(() => {
+    if (!user_id && location.pathname === '/room') {
+      navigate('/');
+    } else if (user_id && location.pathname === '/') {
+      navigate('/room');
+    } else if (socketConnected && location.pathname !== '/' && location.pathname !== '/room') {
+      console.log('location.pathname:', location.pathname);
+      const match = location.pathname.match(regex);
+      console.log('Match:', match);
+      const room_path = match[1];
+      const username_path = match[2];
+
+      if (!username || !user_id || username !== username_path) {
+        if (username || user_id) {
+          dispatch(logout());
+        }
+        dispatch(login(username_path));
+      }
+    }
+    setCheckRedirect(true);
+  }, [socketConnected]);
+
+  // check if user as been login
+  useEffect(() => {
+    if (user_id && username) {
+      navigate('/room');
+    }
+  }, []);
 
   useEffect(() => {
     dispatch(connectionAttempt());
   }, []);
 
-  return <Outlet />;
+  if (!socketConnected || !checkRedirect) {
+    return <div>Connecting...</div>;
+  } else {
+    return <Outlet />;
+  }
 }
 
 export function ErrorBoundary({ error }) {

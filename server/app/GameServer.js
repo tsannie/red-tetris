@@ -10,6 +10,12 @@ class GameServer {
   createPlayer(id, pseudo, socket) {
     const player = new Player(id, pseudo, socket);
     this.players.push(player);
+
+    socket.emit('login', {
+      id: player.id,
+      pseudo: player.pseudo,
+    });
+
     return player;
   }
 

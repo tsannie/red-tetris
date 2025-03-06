@@ -14,28 +14,30 @@ const io = new Server(server, {
 const gameServer = new GameServer();
 let room_id = 0;
 
-io.on('connection', (socket) => {
-  const userId = generateUniqueUserId();
-  console.log('A user connected:', userId);
+io.on('connect', (socket) => {
+  console.log('Inside connect');
+  console.log('A user connected:', socket.id);
 
-  // socket.emit("userId", userId);
+  socket.on('login', (data) => {
+    const userId = generateUniqueUserId();
+    gameServer.createPlayer(userId, data.pseudo, socket);
+    console.log('A user logged in:', data);
+  });
 
-  const player = gameServer.createPlayer(userId, 'tester', socket);
-  const room = gameServer.createRoom(room_id, 'test', player);
-  room_id += 1;
-
-  room.startGame();
+  socket.on('logout', (data) => {
+    //gameServer.deletePlayer(data.id);
+    console.log('A user disconnected:', data);
+  });
 
   socket.on('move', (data) => {
+    // getThePlayerBySocketId
     console.log(`Mouvement reçu: ${data.direction} de user ${userId}`);
-    if ((data.direction === 'left') & player.move([-1, 0])) console.log('mouvement a gauche accepte');
-    else if ((data.direction === 'right') & player.move([1, 0])) console.log('mouvement a gauche accepte');
-    else if ((data.direction === 'down') & player.move([0, 1])) console.log('mouvement en bas accepte');
-    io.emit('gameState', updatedGameState);
+    const socket = this;
+    console.log('socket:', socket);
   });
 
   socket.on('disconnect', () => {
-    console.log('A user disconnected:', userId);
+    console.log('A user disconnected:', socket.id);
   });
 });
 
@@ -44,6 +46,5 @@ server.listen(4000, () => {
 });
 
 function generateUniqueUserId() {
-  // Générer un identifiant unique, par exemple, un UUID ou un timestamp
   return 'user-' + Math.random().toString(36).substr(2, 9);
 }

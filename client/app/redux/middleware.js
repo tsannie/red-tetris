@@ -5,22 +5,22 @@ const SERVER_URL = 'http://localhost:4000';
 
 let socket = null; // Singleton
 
-const socketMiddleware = (store) => {
+const middleware = (store) => {
   return (next) => (action) => {
     switch (action.type) {
       case 'socket/connectionAttempt':
         if (!socket) {
-          socket = io(SERVER_URL);
+          socket = io(SERVER_URL, {
+            transports: ['websocket'],
+          });
 
           socket.on('connect', () => {
-            console.log('Connection established with the server');
+            store.dispatch(connect(socket));
           });
 
           socket.on('update', (data) => {
             store.dispatch(updateRoom(data));
           });
-
-          store.dispatch(connect(socket));
         }
         break;
 
@@ -32,6 +32,27 @@ const socketMiddleware = (store) => {
         }
         break;
 
+      case 'user/logout':
+        if (socket) {
+          socket.emit('logout', { id: action.payload });
+        } else {
+          console.error('Socket not connected');
+        }
+        break;
+
+      case 'user/login':
+        if (socket) {
+          socket.emit('login', { pseudo: action.payload });
+
+          socket.on('connect', (data) => {
+            console.log('Connection established with the server');
+            console.log('data:', data);
+          });
+        } else {
+          console.error('Socket not connected');
+        }
+        break;
+
       default:
         break;
     }
@@ -40,4 +61,4 @@ const socketMiddleware = (store) => {
   };
 };
 
-export default socketMiddleware;
+export default middleware;

@@ -1,13 +1,14 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectPseudo } from '../redux/pseudoSlice';
+import { selectUsername } from '../redux/userSlice';
 
 const Room = () => {
-  const pseudo = useSelector((state) => selectPseudo(state));
+  const username = useSelector((state) => selectUsername(state));
+
   return (
     <div>
       <h1>Room</h1>
-      <p>Welcome, {pseudo}!</p>
+      <p>Hello {username}</p>
     </div>
   );
 };
