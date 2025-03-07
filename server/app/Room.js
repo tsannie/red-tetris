@@ -8,12 +8,24 @@ class Room {
     this.game = new Game();
   }
 
+  movePlayer(player, direction) {
+    this.game.movePlayer(player, direction);
+  }
+
   startGame() {
     this.game.start(this.players);
   }
 
   addPlayer(player) {
     this.players.push(player);
+  }
+
+  updatePlayerState(player) {
+    player.socket.emit('update', {
+      board: player.board.gridWithCurrentTetrimino(player.tetrimino),
+      score: player.score,
+      currentTetrimino: player.tetrimino.getShape(),
+    });
   }
 }
 

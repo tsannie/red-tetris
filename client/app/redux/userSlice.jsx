@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   username: '',
-  id: null,
+  room_name: '',
 };
 
 export const userSlice = createSlice({
@@ -12,22 +12,16 @@ export const userSlice = createSlice({
     setUsername: (state, action) => {
       state.username = action.payload;
     },
-    setId: (state, action) => {
+    setRoomName: (state, action) => {
+      // TODO check useless ?
       state.id = action.payload;
-    },
-    logout: (state) => {
-      state.username = '';
-      state.id = null;
-    },
-    login: (state) => {
-      state = state;
     },
   },
 });
 
-export const { setUsername, setId, logout, login } = userSlice.actions;
+export const { setUsername, setRoomName } = userSlice.actions;
 
 export const selectUsername = (state) => state.user.username;
-export const selectId = (state) => state.user.id;
+export const selectRoomName = (state) => state.user.room_name;
 
 export default userSlice.reducer;

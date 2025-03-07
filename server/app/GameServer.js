@@ -7,8 +7,8 @@ class GameServer {
     this.players = [];
   }
 
-  createPlayer(id, pseudo, socket) {
-    const player = new Player(id, pseudo, socket);
+  createPlayer(pseudo, socket) {
+    const player = new Player(pseudo, socket);
     this.players.push(player);
 
     socket.emit('login_success', {
@@ -30,6 +30,16 @@ class GameServer {
   createRoom(name, playerAdmin) {
     this.rooms[name] = new Room(name, playerAdmin);
     return this.rooms[name];
+  }
+
+  joinOrCreateRoom(name, player) {
+    let room = this.getRoomByName(name);
+    if (room) {
+      room.addPlayer(player);
+    } else {
+      room = this.createRoom(name, player);
+    }
+    return room;
   }
 
   getRoomByName(name) {

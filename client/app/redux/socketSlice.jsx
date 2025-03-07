@@ -25,9 +25,8 @@ const socketSlice = createSlice({
     emitJoinOrCreateRoom: (state) => {
       state = state;
     },
-    emitMove: (state, { payload }) => {
-      console.log('payload', payload);
-      state.socket.emit('move', payload);
+    emitMove: (state) => {
+      state = state;
     },
     emitDrop: (state) => {
       state.socket.emit('drop');

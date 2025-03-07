@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { login, setUsername } from '../redux/userSlice';
+import { setUsername } from '../redux/userSlice';
 import { useNavigate } from 'react-router';
 
 export function meta() {
@@ -18,7 +18,7 @@ const Login = () => {
 
   const handleLogin = () => {
     if (pseudoInput.trim()) {
-      dispatch(login(pseudoInput));
+      dispatch(setUsername(pseudoInput));
       navigate('/room');
     }
   };

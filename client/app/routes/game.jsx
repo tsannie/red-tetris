@@ -3,7 +3,6 @@ import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
 import { emitDrop, emitJoinOrCreateRoom, emitMove, emitRotate } from '../redux/socketSlice';
 import { useLocation } from 'react-router';
-import { login, logout, selectId, selectUsername } from '../redux/userSlice';
 
 const Game = () => {
   const board = useSelector((state) => state.socket.board);
@@ -13,14 +12,14 @@ const Game = () => {
     const handleKeyDown = (e) => {
       switch (e.key) {
         case 'ArrowLeft':
-          dispatch(emitMove('left'));
+          dispatch(emitMove('LEFT'));
           break;
         case 'ArrowRight':
           console.log('right');
-          dispatch(emitMove('right'));
+          dispatch(emitMove('RIGHT'));
           break;
         case 'ArrowDown':
-          dispatch(emitMove('down'));
+          dispatch(emitMove('DOWN'));
           break;
         case 'ArrowUp':
           dispatch(emitRotate());
