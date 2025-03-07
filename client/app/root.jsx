@@ -15,7 +15,7 @@ import { Provider, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { connectionAttempt, emitJoinOrCreateRoom, selectIsConnected } from './redux/socketSlice';
-import { selectUsername, setUsername } from './redux/roomInfoSlice';
+import { selectUsername, setRoomName, setUsername } from './redux/roomInfoSlice';
 
 export const links = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -84,9 +84,9 @@ export default function App() {
       navigate('/room');
     } else if (location.pathname !== '/' && location.pathname !== '/room') {
       // useless ?
-      /* const match = location.pathname.match(regex);
+      const match = location.pathname.match(regex);
       dispatch(setUsername(match[2]));
-      dispatch(setRoomName(match[1])); */
+      dispatch(setRoomName(match[1]));
     }
     setCheckRedirect(true);
   }, [socketConnected, location.pathname]);

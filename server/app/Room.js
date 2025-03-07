@@ -29,10 +29,15 @@ class Room {
   }
 
   updateInfoRoom() {
+    // return { players: {id, pseudo}, id_admin }
+    const players = this.players.map((player) => ({
+      id: player.id,
+      username: player.pseudo,
+    }));
     this.players.forEach((player) => {
       player.socket.emit('updateInfoRoom', {
-        players: this.players.map((player) => player.pseudo),
-        is_admin: player.id === this.admin_id ? true : false,
+        players,
+        admin_id: this.admin_id,
       });
     });
   }

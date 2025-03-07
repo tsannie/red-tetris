@@ -1,3 +1,4 @@
+import { setAdminId, setPlayers } from './roomInfoSlice';
 import { connect, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
@@ -28,7 +29,8 @@ const middleware = (store) => (next) => async (action) => {
         socket.emit('joinOrCreateRoom', action.payload);
 
         socket.on('updateInfoRoom', (data) => {
-          console.log('infoRoom', data);
+          store.dispatch(setPlayers(data.players));
+          store.dispatch(setAdminId(data.admin_id));
         });
       } else {
         console.error('Socket not connected');

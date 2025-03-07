@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { use } from 'react';
+import { useSelector } from 'react-redux';
+import { selectPlayers } from '../redux/roomInfoSlice';
 
 const WaitingRoom = () => {
-  const players = ['Player 1', 'Player 2', 'Player 3', 'Player 4', 'Player 5', 'Player 6'];
+  const players = useSelector((state) => selectPlayers(state));
+  //
+  //const players = [{ username: 'Player 1' }, { username: 'Player 2' }, { username: 'Player 3' }];
+
+  console.log(players);
 
   const handleStartGame = () => {
     console.log('Start Game');
@@ -20,7 +26,7 @@ const WaitingRoom = () => {
               key={index}
               className="flex items-center justify-center bg-red-950 rounded-lg w-64 h-16 text-2xl overflow-hidden"
             >
-              {players[index] || '...'}
+              {players[index] ? players[index].username : '...'}
             </li>
           ))}
         </ul>

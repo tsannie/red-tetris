@@ -1,27 +1,36 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  isAdmin: false,
-  room_name: '',
+  players: [],
+  room_name: null,
+  admin_id: null,
+  username: null,
 };
 
 export const roomInfoSlice = createSlice({
-  name: 'user',
+  name: 'room',
   initialState,
   reducers: {
-    setUsername: (state, action) => {
-      state.username = action.payload;
+    setPlayers: (state, action) => {
+      state.players = action.payload;
     },
     setRoomName: (state, action) => {
-      // TODO check useless ?
-      state.id = action.payload;
+      state.room_name = action.payload;
+    },
+    setAdminId: (state, action) => {
+      state.admin_id = action.payload;
+    },
+    setUsername: (state, action) => {
+      state.username = action.payload;
     },
   },
 });
 
-export const { setUsername, setRoomName } = roomInfoSlice.actions;
+export const { setPlayers, setRoomName, setAdminId, setUsername } = roomInfoSlice.actions;
 
 export const selectUsername = (state) => state.room.username;
 export const selectRoomName = (state) => state.room.room_name;
+export const selectPlayers = (state) => state.room.players;
+export const selectAdminId = (state) => state.room.admin_id;
 
 export default roomInfoSlice.reducer;
