@@ -23,6 +23,12 @@ io.on('connect', (socket) => {
     player = gameServer.createPlayer(data.username, socket);
     room = gameServer.joinOrCreateRoom(data.room_name, player);
 
+    room.updateInfoRoom();
+  });
+
+  socket.on('startGame', () => {
+    if (!room || !player || room.admin_id !== player.id) return; // TODO check state of room
+
     room.startGame();
   });
 

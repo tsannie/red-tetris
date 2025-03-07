@@ -3,6 +3,7 @@ import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
 import { emitDrop, emitJoinOrCreateRoom, emitMove, emitRotate } from '../redux/socketSlice';
 import { useLocation } from 'react-router';
+import WaitingRoom from '../components/WaitingRoom';
 
 const Game = () => {
   const board = useSelector((state) => state.socket.board);
@@ -39,7 +40,7 @@ const Game = () => {
   }, []);
 
   if (!board || !board.length) {
-    return <div>Loading...</div>;
+    return <WaitingRoom />;
   } else {
     return (
       <div>

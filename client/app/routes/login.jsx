@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUsername } from '../redux/userSlice';
+import { setUsername } from '../redux/roomInfoSlice';
 import { useNavigate } from 'react-router';
 
 export function meta() {

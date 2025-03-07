@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  username: '',
+  isAdmin: false,
   room_name: '',
 };
 
-export const userSlice = createSlice({
+export const roomInfoSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
@@ -19,9 +19,9 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUsername, setRoomName } = userSlice.actions;
+export const { setUsername, setRoomName } = roomInfoSlice.actions;
 
-export const selectUsername = (state) => state.user.username;
-export const selectRoomName = (state) => state.user.room_name;
+export const selectUsername = (state) => state.room.username;
+export const selectRoomName = (state) => state.room.room_name;
 
-export default userSlice.reducer;
+export default roomInfoSlice.reducer;

@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import pseudoReducer from './userSlice';
+import pseudoReducer from './roomInfoSlice';
 import socketReducer from './socketSlice';
 import middleware from './middleware';
 
 const store = configureStore({
   reducer: {
-    user: pseudoReducer,
+    room: pseudoReducer,
     socket: socketReducer,
   },
   middleware: (getDefaultMiddleware) =>

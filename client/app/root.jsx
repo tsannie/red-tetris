@@ -15,7 +15,7 @@ import { Provider, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { connectionAttempt, emitJoinOrCreateRoom, selectIsConnected } from './redux/socketSlice';
-import { selectUsername, setUsername } from './redux/userSlice';
+import { selectUsername, setUsername } from './redux/roomInfoSlice';
 
 export const links = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -42,7 +42,7 @@ export function Layout({ children }) {
       </head>
       <body>
         <Provider store={store}>
-          <main className="flex items-center justify-center min-h-screen bg-red-950">
+          <main className="bg-red-800 min-h-screen">
             {children}
             <ScrollRestoration />
             <Scripts />

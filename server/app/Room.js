@@ -1,10 +1,10 @@
 import Game from './Game.js';
 
 class Room {
-  constructor(name, playerAdmin) {
+  constructor(name, admin_player) {
     this.name = name;
-    this.players = [playerAdmin];
-    this.idAdmin = playerAdmin.id;
+    this.players = [admin_player];
+    this.admin_id = admin_player.id;
     this.game = new Game();
   }
 
@@ -25,6 +25,15 @@ class Room {
       board: player.board.gridWithCurrentTetrimino(player.tetrimino),
       score: player.score,
       currentTetrimino: player.tetrimino.getShape(),
+    });
+  }
+
+  updateInfoRoom() {
+    this.players.forEach((player) => {
+      player.socket.emit('updateInfoRoom', {
+        players: this.players.map((player) => player.pseudo),
+        is_admin: player.id === this.admin_id ? true : false,
+      });
     });
   }
 }

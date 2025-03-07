@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectUsername } from '../redux/userSlice';
+import { selectUsername } from '../redux/roomInfoSlice';
 
 const Room = () => {
   const username = useSelector((state) => selectUsername(state));

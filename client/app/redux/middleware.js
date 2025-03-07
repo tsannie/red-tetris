@@ -26,6 +26,10 @@ const middleware = (store) => (next) => async (action) => {
     case 'socket/emitJoinOrCreateRoom':
       if (socket) {
         socket.emit('joinOrCreateRoom', action.payload);
+
+        socket.on('updateInfoRoom', (data) => {
+          console.log('infoRoom', data);
+        });
       } else {
         console.error('Socket not connected');
       }
