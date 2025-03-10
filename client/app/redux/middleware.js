@@ -1,4 +1,4 @@
-import { setAdminId, setPlayers, setUserId } from './roomInfoSlice';
+import { setAdminId, setPlayers, setRoomsList, setUserId } from './roomInfoSlice';
 import { connect, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
@@ -29,8 +29,7 @@ const middleware = (store) => (next) => async (action) => {
         });
 
         socket.on('updateRoomsList', (data) => {
-          console.log('updateRoomsList');
-          console.log(data);
+          store.dispatch(setRoomsList(data));
         });
       }
       break;
@@ -38,6 +37,14 @@ const middleware = (store) => (next) => async (action) => {
     case 'socket/emitStart':
       if (socket) {
         socket.emit('startGame');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
+    case 'socket/emitGetRooms':
+      if (socket) {
+        socket.emit('getRoomsList');
       } else {
         console.error('Socket not connected');
       }

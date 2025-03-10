@@ -6,12 +6,13 @@ const initialState = {
   board: [],
 };
 
-const connectionAttempt = createAction('socket/connectionAttempt');
-const emitJoinOrCreateRoom = createAction('socket/emitJoinOrCreateRoom');
-const emitMove = createAction('socket/emitMove');
-const emitDrop = createAction('socket/emitDrop');
-const emitRotate = createAction('socket/emitRotate');
-const emitStart = createAction('socket/emitStart');
+export const connectionAttempt = createAction('socket/connectionAttempt');
+export const emitJoinOrCreateRoom = createAction('socket/emitJoinOrCreateRoom');
+export const emitMove = createAction('socket/emitMove');
+export const emitDrop = createAction('socket/emitDrop');
+export const emitRotate = createAction('socket/emitRotate');
+export const emitStart = createAction('socket/emitStart');
+export const emitGetRooms = createAction('socket/emitGetRooms');
 
 const socketSlice = createSlice({
   name: 'socket',
@@ -30,8 +31,6 @@ const socketSlice = createSlice({
     },
   },
 });
-
-export { connectionAttempt, emitJoinOrCreateRoom, emitMove, emitDrop, emitRotate, emitStart };
 
 export const { connect, disconnect, updateRoom } = socketSlice.actions;
 
