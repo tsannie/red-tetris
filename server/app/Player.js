@@ -1,9 +1,10 @@
-import Tetrimino from "./Tetrimino.js";
+import Tetrimino from './Tetrimino.js';
+import { generateUniqueUserId } from './utils.js';
 
 class Player {
-  constructor(id, pseudo, socket) {
+  constructor(pseudo, socket) {
     this.socket = socket;
-    this.id = id;
+    this.id = generateUniqueUserId();
     this.pseudo = pseudo;
     this.score = 0;
     this.board = null;
@@ -15,29 +16,19 @@ class Player {
     this.score += points;
   }
 
-  move(vector) {
-    let tetrimino_to_test = Tetrimino.clone(this.tetrimino)
+  canMove(vector) {
+    let tetrimino_to_test = Tetrimino.clone(this.tetrimino);
     tetrimino_to_test.move(vector);
-    const number_of_t_before_move = this.board.numberOfTOnGrid(
-      this.board.gridWithCurrentTetrimino(this.tetrimino)
-    );
-    const number_of_t_after_move = this.board.numberOfTOnGrid(
-      this.board.gridWithCurrentTetrimino(tetrimino_to_test)
-    );
-    if (number_of_t_after_move!=number_of_t_before_move){
-      return false
-    }
-    else {
-      this.tetrimino.move(vector)
-      this.socket.emit('update', {
-        board: this.board.gridWithCurrentTetrimino(this.tetrimino),
-        score: this.score,
-        currentTetrimino: this.tetrimino.getShape(),
-      });
-      return true
-    }
+    const number_of_t_before_move = this.board.numberOfTOnGrid(this.board.gridWithCurrentTetrimino(this.tetrimino));
+    const number_of_t_after_move = this.board.numberOfTOnGrid(this.board.gridWithCurrentTetrimino(tetrimino_to_test));
+    return number_of_t_before_move === number_of_t_after_move;
   }
 
+  move(vector) {
+    if (!this.canMove(vector)) return false;
+    this.tetrimino.move(vector);
+    return true;
+  }
 }
 
 export default Player;

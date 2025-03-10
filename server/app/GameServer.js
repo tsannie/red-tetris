@@ -7,19 +7,16 @@ class GameServer {
     this.players = [];
   }
 
-  createPlayer(id, pseudo, socket) {
-    const player = new Player(id, pseudo, socket);
+  createPlayer(pseudo, socket) {
+    const player = new Player(pseudo, socket);
     this.players.push(player);
+
+    socket.emit('login_success', {
+      id: player.id,
+      pseudo: player.pseudo,
+    });
+
     return player;
-  }
-
-  createRoom(id, name, playerAdmin) {
-    this.rooms[id] = new Room(id, name, playerAdmin);
-    return this.rooms[id];
-  }
-
-  deleteRoom(id) {
-    delete this.rooms[id];
   }
 
   deletePlayer(id) {
@@ -30,8 +27,23 @@ class GameServer {
     return this.players.find((player) => player.id === id);
   }
 
-  getRoomById(id) {
-    return this.rooms[id];
+  createRoom(name, playerAdmin) {
+    this.rooms[name] = new Room(name, playerAdmin);
+    return this.rooms[name];
+  }
+
+  joinOrCreateRoom(name, player) {
+    let room = this.getRoomByName(name);
+    if (room) {
+      room.addPlayer(player);
+    } else {
+      room = this.createRoom(name, player);
+    }
+    return room;
+  }
+
+  getRoomByName(name) {
+    return this.rooms[name];
   }
 }
 

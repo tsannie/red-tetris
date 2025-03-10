@@ -1,15 +1,20 @@
 import React from 'react';
-import Row from './Row';
-import { useEffect } from 'react';
-import io from 'socket.io-client';
+import Cell from './Cell';
 
 const Board = ({ board_value }) => {
-  //console.log('board_value:', board_value);
-  const Rows = board_value.map((row, index) => <Row key={index} row_value={row} />);
-
-  console.log('Rows:', Rows);
-
-  return <div className="flex flex-col">{Rows}</div>;
+  return (
+    <div
+      className="grid gap-0 border-4 border-red-900"
+      style={{
+        gridTemplateColumns: `repeat(${board_value[0].length}, 2.5rem)`,
+        gridTemplateRows: `repeat(${board_value.length}, 2.5rem)`,
+      }}
+    >
+      {board_value.flat().map((cell, index) => (
+        <Cell key={index} cell_value={cell} />
+      ))}
+    </div>
+  );
 };
 
 export default Board;

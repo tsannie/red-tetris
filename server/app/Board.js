@@ -2,9 +2,7 @@ import { BOARD_HEIGHT, BOARD_WIDTH } from './const.js';
 
 class Board {
   constructor() {
-    this.grid = Array.from({ length: BOARD_HEIGHT }, () =>
-      Array(BOARD_WIDTH).fill(0)
-    );
+    this.grid = Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0));
   }
 
   // exemple tetrimino.shape:
@@ -17,7 +15,7 @@ class Board {
   gridWithCurrentTetrimino(tetrimino, dev = false) {
     const grid = this.grid.map((row) => row.slice());
     const shape = tetrimino.getShape();
-    if (dev)  console.log("try to insert tetrimino: ", shape);
+    //if (dev)  console.log("try to insert tetrimino: ", shape);
 
     const shapeHeight = shape.length;
     const shapeWidth = shape[0].length;
@@ -38,30 +36,25 @@ class Board {
           const gridX = posX - centerX + x;
           const gridY = posY - centerY + y;
 
-          if (
-            gridX >= 0 &&
-            gridX < BOARD_WIDTH &&
-            gridY >= 0 &&
-            gridY < BOARD_HEIGHT
-          ) {
-            grid[gridY][gridX] = "t";
+          if (gridX >= 0 && gridX < BOARD_WIDTH && gridY >= 0 && gridY < BOARD_HEIGHT) {
+            grid[gridY][gridX] = 't';
           }
         }
       }
     }
-
+    /*
     if (dev) {
       for (let y = 0; y < BOARD_HEIGHT; y++) {
         console.log(JSON.stringify(grid[y]));
       }
-    }
+    } */
     return grid;
   }
 
   // appeler cette fonction lorsque un tetrimino est arrive a la collision
   // et le rajouter au grid
   keepTetriminoOnBoard(tetrimino) {
-    this.grid = this.gridWithCurrentTetrimino(tetrimino)
+    this.grid = this.gridWithCurrentTetrimino(tetrimino);
   }
 
   // cette fonction compte le nombre de 't' present sur le grid
@@ -69,9 +62,9 @@ class Board {
   numberOfTOnGrid(grid) {
     let number_of_t = 0;
     for (let y = 0; y < BOARD_HEIGHT; y++) {
-      number_of_t += grid[y].filter((element) => element === "t").length;
+      number_of_t += grid[y].filter((element) => element === 't').length;
     }
-    return number_of_t
+    return number_of_t;
   }
 }
 

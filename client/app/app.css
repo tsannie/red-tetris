@@ -1,15 +1,28 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'ArcadeAlternate';
+  src: url('/assets/police/ArcadeAlternate.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  --font-arcade: 'ArcadeAlternate', sans-serif;
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
-
+  @apply bg-white dark:bg-gray-950 font-sans;
+  font-family: var(--font-arcade);
+  font-size: 20px;
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+button {
+  cursor: pointer;
 }
