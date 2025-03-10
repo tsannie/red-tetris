@@ -43,7 +43,7 @@ const Game = () => {
     return <WaitingRoom />;
   } else {
     return (
-      <div>
+      <div className="flex justify-center items-center h-screen">
         <Board board_value={board} />
       </div>
     );

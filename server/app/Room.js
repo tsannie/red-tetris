@@ -38,6 +38,7 @@ class Room {
       player.socket.emit('updateInfoRoom', {
         players,
         admin_id: this.admin_id,
+        user_id: player.id,
       });
     });
   }

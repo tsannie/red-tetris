@@ -23,14 +23,18 @@ export const roomInfoSlice = createSlice({
     setUsername: (state, action) => {
       state.username = action.payload;
     },
+    setUserId: (state, action) => {
+      state.user_id = action.payload;
+    },
   },
 });
 
-export const { setPlayers, setRoomName, setAdminId, setUsername } = roomInfoSlice.actions;
+export const { setPlayers, setRoomName, setAdminId, setUsername, setUserId } = roomInfoSlice.actions;
 
 export const selectUsername = (state) => state.room.username;
 export const selectRoomName = (state) => state.room.room_name;
 export const selectPlayers = (state) => state.room.players;
 export const selectAdminId = (state) => state.room.admin_id;
+export const selectUserId = (state) => state.room.user_id;
 
 export default roomInfoSlice.reducer;

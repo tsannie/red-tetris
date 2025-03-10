@@ -1,4 +1,4 @@
-import { setAdminId, setPlayers } from './roomInfoSlice';
+import { setAdminId, setPlayers, setUserId } from './roomInfoSlice';
 import { connect, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
@@ -24,6 +24,14 @@ const middleware = (store) => (next) => async (action) => {
       }
       break;
 
+    case 'socket/emitStart':
+      if (socket) {
+        socket.emit('startGame');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
     case 'socket/emitJoinOrCreateRoom':
       if (socket) {
         socket.emit('joinOrCreateRoom', action.payload);
@@ -31,6 +39,7 @@ const middleware = (store) => (next) => async (action) => {
         socket.on('updateInfoRoom', (data) => {
           store.dispatch(setPlayers(data.players));
           store.dispatch(setAdminId(data.admin_id));
+          store.dispatch(setUserId(data.user_id));
         });
       } else {
         console.error('Socket not connected');
@@ -40,6 +49,30 @@ const middleware = (store) => (next) => async (action) => {
     case 'socket/emitMove':
       if (socket) {
         socket.emit('move', action.payload);
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
+    case 'socket/emitDrop':
+      if (socket) {
+        socket.emit('drop');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
+    case 'socket/emitRotate':
+      if (socket) {
+        socket.emit('rotate');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
+    case 'socket/emitStart':
+      if (socket) {
+        socket.emit('startGame');
       } else {
         console.error('Socket not connected');
       }
