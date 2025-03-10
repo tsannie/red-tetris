@@ -30,6 +30,7 @@ io.on('connect', (socket) => {
     if (!room || !player || room.admin_id !== player.id) return; // TODO check state of room
 
     room.startGame();
+    gameServer.updateRoomsList();
   });
 
   socket.on('move', (direction) => {
@@ -37,6 +38,18 @@ io.on('connect', (socket) => {
     if (player.move(direction_vector[direction])) {
       room.updatePlayerState(player);
     }
+  });
+
+  socket.on('rotate', () => {
+    if (!room || !player) return; // TODO also check if the game is started
+    if (player.rotate()) {
+      room.updatePlayerState(player);
+    }
+  });
+
+  socket.on('getRoomsList', () => {
+    const rooms = gameServer.getAllRooms();
+    socket.emit('updateRoomsList', rooms);
   });
 
   socket.on('disconnect', () => {

@@ -9,7 +9,7 @@ const WaitingRoom = () => {
   const admin_id = useSelector((state) => selectAdminId(state));
   const roomName = useSelector((state) => selectRoomName(state));
   const dispatch = useDispatch();
-  //
+
   const handleStartGame = () => {
     dispatch(emitStart());
   };

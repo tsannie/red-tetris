@@ -21,6 +21,17 @@ const middleware = (store) => (next) => async (action) => {
         socket.on('update', (data) => {
           store.dispatch(updateRoom(data));
         });
+
+        socket.on('updateInfoRoom', (data) => {
+          store.dispatch(setPlayers(data.players));
+          store.dispatch(setAdminId(data.admin_id));
+          store.dispatch(setUserId(data.user_id));
+        });
+
+        socket.on('updateRoomsList', (data) => {
+          console.log('updateRoomsList');
+          console.log(data);
+        });
       }
       break;
 
@@ -35,12 +46,6 @@ const middleware = (store) => (next) => async (action) => {
     case 'socket/emitJoinOrCreateRoom':
       if (socket) {
         socket.emit('joinOrCreateRoom', action.payload);
-
-        socket.on('updateInfoRoom', (data) => {
-          store.dispatch(setPlayers(data.players));
-          store.dispatch(setAdminId(data.admin_id));
-          store.dispatch(setUserId(data.user_id));
-        });
       } else {
         console.error('Socket not connected');
       }

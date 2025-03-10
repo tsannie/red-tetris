@@ -32,6 +32,23 @@ class GameServer {
     return this.rooms[name];
   }
 
+  getAllRooms() {
+    return Object.keys(this.rooms).map((name) => ({
+      room_name: name,
+      nb_players: this.rooms[name].players.length,
+      admin_id: this.rooms[name].admin_id,
+      admin_username: this.getPlayerById(this.rooms[name].admin_id).pseudo,
+      state: this.rooms[name].getState(),
+    }));
+  }
+
+  updateRoomsList() {
+    const rooms = this.getAllRooms();
+    this.players.forEach((player) => {
+      player.socket.emit('updateRoomsList', rooms);
+    });
+  }
+
   joinOrCreateRoom(name, player) {
     let room = this.getRoomByName(name);
     if (room) {
@@ -39,6 +56,7 @@ class GameServer {
     } else {
       room = this.createRoom(name, player);
     }
+    this.updateRoomsList();
     return room;
   }
 
