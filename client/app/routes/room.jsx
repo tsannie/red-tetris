@@ -4,7 +4,7 @@ import { selectUsername } from '../redux/roomInfoSlice';
 
 const Room = () => {
   const username = useSelector((state) => selectUsername(state));
-  const rooms
+  //const rooms
 
   return (
     <div>
