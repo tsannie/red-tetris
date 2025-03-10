@@ -5,6 +5,15 @@ class GameServer {
   constructor() {
     this.rooms = {};
     this.players = [];
+    this.visitors = [];
+  }
+
+  addVisitor(socket) {
+    this.visitors.push(socket);
+  }
+
+  removeVisitor(socket) {
+    this.visitors = this.visitors.filter((visitor) => visitor !== socket);
   }
 
   createPlayer(pseudo, socket) {
@@ -44,8 +53,8 @@ class GameServer {
 
   updateRoomsList() {
     const rooms = this.getAllRooms();
-    this.players.forEach((player) => {
-      player.socket.emit('updateRoomsList', rooms);
+    this.visitors.forEach((visitor) => {
+      visitor.emit('updateRoomsList', rooms);
     });
   }
 

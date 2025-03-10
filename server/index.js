@@ -18,6 +18,7 @@ io.on('connect', (socket) => {
   let player = null;
 
   console.log('A user connected:', socket.id);
+  gameServer.addVisitor(socket);
 
   socket.on('joinOrCreateRoom', (data) => {
     player = gameServer.createPlayer(data.username, socket);
@@ -53,6 +54,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    gameServer.removeVisitor(socket);
     console.log('A user disconnected:', socket.id);
   });
 });
