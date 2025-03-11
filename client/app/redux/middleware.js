@@ -1,4 +1,4 @@
-import { setAdminId, setPlayers, setUserId } from './roomInfoSlice';
+import { setAdminId, setPlayers, setRoomsList, setUserId } from './roomInfoSlice';
 import { connect, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
@@ -21,6 +21,16 @@ const middleware = (store) => (next) => async (action) => {
         socket.on('update', (data) => {
           store.dispatch(updateRoom(data));
         });
+
+        socket.on('updateInfoRoom', (data) => {
+          store.dispatch(setPlayers(data.players));
+          store.dispatch(setAdminId(data.admin_id));
+          store.dispatch(setUserId(data.user_id));
+        });
+
+        socket.on('updateRoomsList', (data) => {
+          store.dispatch(setRoomsList(data));
+        });
       }
       break;
 
@@ -32,15 +42,17 @@ const middleware = (store) => (next) => async (action) => {
       }
       break;
 
+    case 'socket/emitGetRooms':
+      if (socket) {
+        socket.emit('getRoomsList');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
     case 'socket/emitJoinOrCreateRoom':
       if (socket) {
         socket.emit('joinOrCreateRoom', action.payload);
-
-        socket.on('updateInfoRoom', (data) => {
-          store.dispatch(setPlayers(data.players));
-          store.dispatch(setAdminId(data.admin_id));
-          store.dispatch(setUserId(data.user_id));
-        });
       } else {
         console.error('Socket not connected');
       }

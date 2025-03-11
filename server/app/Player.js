@@ -29,6 +29,11 @@ class Player {
     this.tetrimino.move(vector);
     return true;
   }
+
+  rotate() {
+    this.tetrimino.rotate();
+    return true;
+  }
 }
 
 export default Player;

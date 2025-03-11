@@ -5,6 +5,15 @@ class GameServer {
   constructor() {
     this.rooms = {};
     this.players = [];
+    this.visitors = [];
+  }
+
+  addVisitor(socket) {
+    this.visitors.push(socket);
+  }
+
+  removeVisitor(socket) {
+    this.visitors = this.visitors.filter((visitor) => visitor !== socket);
   }
 
   createPlayer(pseudo, socket) {
@@ -32,6 +41,23 @@ class GameServer {
     return this.rooms[name];
   }
 
+  getAllRooms() {
+    return Object.keys(this.rooms).map((name) => ({
+      room_name: name,
+      nb_players: this.rooms[name].players.length,
+      admin_id: this.rooms[name].admin_id,
+      admin_username: this.getPlayerById(this.rooms[name].admin_id).pseudo,
+      state: this.rooms[name].getState(),
+    }));
+  }
+
+  updateRoomsList() {
+    const rooms = this.getAllRooms();
+    this.visitors.forEach((visitor) => {
+      visitor.emit('updateRoomsList', rooms);
+    });
+  }
+
   joinOrCreateRoom(name, player) {
     let room = this.getRoomByName(name);
     if (room) {
@@ -39,6 +65,7 @@ class GameServer {
     } else {
       room = this.createRoom(name, player);
     }
+    this.updateRoomsList();
     return room;
   }
 

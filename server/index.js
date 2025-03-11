@@ -18,6 +18,7 @@ io.on('connect', (socket) => {
   let player = null;
 
   console.log('A user connected:', socket.id);
+  gameServer.addVisitor(socket);
 
   socket.on('joinOrCreateRoom', (data) => {
     player = gameServer.createPlayer(data.username, socket);
@@ -30,6 +31,7 @@ io.on('connect', (socket) => {
     if (!room || !player || room.admin_id !== player.id) return; // TODO check state of room
 
     room.startGame();
+    gameServer.updateRoomsList();
   });
 
   socket.on('move', (direction) => {
@@ -39,7 +41,20 @@ io.on('connect', (socket) => {
     }
   });
 
+  socket.on('rotate', () => {
+    if (!room || !player) return; // TODO also check if the game is started
+    if (player.rotate()) {
+      room.updatePlayerState(player);
+    }
+  });
+
+  socket.on('getRoomsList', () => {
+    const rooms = gameServer.getAllRooms();
+    socket.emit('updateRoomsList', rooms);
+  });
+
   socket.on('disconnect', () => {
+    gameServer.removeVisitor(socket);
     console.log('A user disconnected:', socket.id);
   });
 });

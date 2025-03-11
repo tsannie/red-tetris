@@ -8,6 +8,10 @@ class Room {
     this.game = new Game();
   }
 
+  getState() {
+    return this.game.state;
+  }
+
   movePlayer(player, direction) {
     this.game.movePlayer(player, direction);
   }
