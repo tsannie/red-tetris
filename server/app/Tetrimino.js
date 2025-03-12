@@ -3,7 +3,7 @@ import { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS } from './const.js';
 class Tetrimino {
   constructor(key) {
     this.shape = TETRIMINOS[key].shape;
-    //this.color = color;
+    this.color = TETRIMINOS[key].color;
     this.position = [BOARD_WIDTH / 2, Math.ceil(this.shape[0].length / 2)];
     this.rotation = 0;
   }
@@ -12,7 +12,6 @@ class Tetrimino {
   static clone(original) {
     // Crée une copie profonde des données
     const copy = structuredClone(original);
-    // Rétablit le prototype pour conserver les méthodes
     Object.setPrototypeOf(copy, Tetrimino.prototype);
     return copy;
   }
@@ -28,6 +27,10 @@ class Tetrimino {
 
   getShape() {
     return this.shape[this.rotation];
+  }
+
+  getColor() {
+    return this.color;
   }
 }
 

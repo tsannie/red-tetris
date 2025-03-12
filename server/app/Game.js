@@ -70,9 +70,10 @@ class Game {
     this.players.forEach((player) => {
       player.socket.emit('gameStarted');
     });
+    this.update();
     this.interval = setInterval(() => {
       this.update();
-    }, 500);
+    }, 5000);
   }
 }
 

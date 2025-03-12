@@ -167,4 +167,14 @@ const TETRIMINOS = {
   },
 };
 
-export { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS };
+const CODE_COLOR = {
+  c: "Cyan",
+  b: "Blue",
+  o: "Orange",
+  g: "Green",
+  p: "Purple",
+  r: "Red",
+  t: "Black"
+};
+
+export { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS, CODE_COLOR};

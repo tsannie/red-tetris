@@ -21,6 +21,7 @@ io.on('connect', (socket) => {
   gameServer.addVisitor(socket);
 
   socket.on('joinOrCreateRoom', (data) => {
+    console.log("joinOrCreateRoom");
     player = gameServer.createPlayer(data.username, socket);
     room = gameServer.joinOrCreateRoom(data.room_name, player);
 
@@ -28,6 +29,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('startGame', () => {
+    console.log("startGame");
     if (!room || !player || room.admin_id !== player.id) return; // TODO check state of room
 
     room.startGame();
@@ -35,6 +37,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('move', (direction) => {
+    console.log("move:", direction);
     if (!room || !player || direction_vector[direction] === undefined) return; // TODO also check if the game is started
     if (player.move(direction_vector[direction])) {
       room.updatePlayerState(player);
@@ -42,6 +45,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('rotate', () => {
+    console.log("rotate");
     if (!room || !player) return; // TODO also check if the game is started
     if (player.rotate()) {
       room.updatePlayerState(player);
@@ -49,6 +53,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('getRoomsList', () => {
+    console.log("getRoomsList");
     const rooms = gameServer.getAllRooms();
     socket.emit('updateRoomsList', rooms);
   });
