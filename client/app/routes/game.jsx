@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
-import { emitMove } from '../redux/socketSlice';
+import { emitDrop, emitJoinOrCreateRoom, emitMove, emitRotate } from '../redux/socketSlice';
+import { useLocation } from 'react-router';
+import WaitingRoom from '../components/WaitingRoom';
 
 const Game = () => {
-  const socket = useSelector((state) => state.socket);
   const board = useSelector((state) => state.socket.board);
   const dispatch = useDispatch();
 
@@ -12,27 +13,26 @@ const Game = () => {
     const handleKeyDown = (e) => {
       switch (e.key) {
         case 'ArrowLeft':
-          dispatch(emitMove('left'));
+          dispatch(emitMove('LEFT'));
           break;
         case 'ArrowRight':
           console.log('right');
-          dispatch(emitMove('right'));
+          dispatch(emitMove('RIGHT'));
           break;
         case 'ArrowDown':
-          socket.emit('move', 'down');
+          dispatch(emitMove('DOWN'));
           break;
         case 'ArrowUp':
-          socket.emit('rotate');
+          dispatch(emitRotate());
           break;
         case ' ':
-          socket.emit('drop');
+          dispatch(emitDrop());
           break;
         default:
           break;
       }
     };
 
-    console.log('Adding event listener');
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
@@ -40,10 +40,10 @@ const Game = () => {
   }, []);
 
   if (!board || !board.length) {
-    return <div>Loading...</div>;
+    return <WaitingRoom />;
   } else {
     return (
-      <div>
+      <div className="flex justify-center items-center h-screen">
         <Board board_value={board} />
       </div>
     );

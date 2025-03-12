@@ -1,49 +1,39 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAction } from '@reduxjs/toolkit';
 
 const initialState = {
-  isConnected: false,
+  socketConnected: false,
   socket: null,
   board: [],
 };
+
+export const connectionAttempt = createAction('socket/connectionAttempt');
+export const emitJoinOrCreateRoom = createAction('socket/emitJoinOrCreateRoom');
+export const emitMove = createAction('socket/emitMove');
+export const emitDrop = createAction('socket/emitDrop');
+export const emitRotate = createAction('socket/emitRotate');
+export const emitStart = createAction('socket/emitStart');
+export const emitGetRooms = createAction('socket/emitGetRooms');
 
 const socketSlice = createSlice({
   name: 'socket',
   initialState,
   reducers: {
     connect: (state, { payload }) => {
-      console.log('Connection established with the server');
-      state.isConnected = true;
+      state.socketConnected = true;
       state.socket = payload;
     },
-    connectionAttempt: (state) => {
-      state = state;
-    },
     disconnect: (state) => {
-      state.isConnected = false;
+      state.socketConnected = false;
       state.socket = null;
     },
-
-    emitMove: (state, { payload }) => {
-      console.log('emit move', payload);
-      state.socket.emit('move', payload);
-    },
-    emitDrop: (state) => {
-      state.socket.emit('drop');
-    },
-    emitRotate: (state) => {
-      state.socket.emit('rotate');
-    },
-    emitStart: (state) => {
-      state.socket.emit('start');
-    },
-
     updateRoom: (state, { payload }) => {
       state.board = payload.board;
     },
   },
 });
 
-export const { connect, connectionAttempt, disconnect, emitMove, emitDrop, emitRotate, emitStart, updateRoom } =
-  socketSlice.actions;
+export const { connect, disconnect, updateRoom } = socketSlice.actions;
+
+export const selectIsConnected = (state) => state.socket.socketConnected;
 
 export default socketSlice.reducer;

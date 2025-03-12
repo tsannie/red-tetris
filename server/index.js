@@ -2,47 +2,63 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import GameServer from './app/GameServer.js';
+import { direction_vector } from './app/utils.js';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173', // Change this if your frontend has a different URL
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
   },
 });
 const gameServer = new GameServer();
-let room_id = 0;
+io.on('connect', (socket) => {
+  let room = null;
+  let player = null;
 
-io.on('connection', (socket) => {
-  const userId = generateUniqueUserId();
-  console.log('A user connected:', userId);
+  console.log('A user connected:', socket.id);
+  gameServer.addVisitor(socket);
 
-  // socket.emit("userId", userId);
+  socket.on('joinOrCreateRoom', (data) => {
+    player = gameServer.createPlayer(data.username, socket);
+    room = gameServer.joinOrCreateRoom(data.room_name, player);
 
-  const player = gameServer.createPlayer(userId, 'tester', socket);
-  const room = gameServer.createRoom(room_id, 'test', player);
-  room_id += 1;
+    room.updateInfoRoom();
+  });
 
-  room.startGame();
+  socket.on('startGame', () => {
+    if (!room || !player || room.admin_id !== player.id) return; // TODO check state of room
+
+    room.startGame();
+    gameServer.updateRoomsList();
+  });
 
   socket.on('move', (direction) => {
-    console.log(`Mouvement reçu: ${direction} de ${userId}`);
-    if ((direction === 'left') && player.move([-1, 0])) console.log('mouvement a gauche accepte');
-    else if ((direction === 'right') && player.move([1, 0])) console.log('mouvement a gauche accepte');
-    else if ((direction === 'down') && player.move([0, 1])) console.log('mouvement en bas accepte');
+    if (!room || !player || direction_vector[direction] === undefined) return; // TODO also check if the game is started
+    if (player.move(direction_vector[direction])) {
+      room.updatePlayerState(player);
+    }
+  });
+
+  socket.on('rotate', () => {
+    if (!room || !player) return; // TODO also check if the game is started
+    if (player.rotate()) {
+      room.updatePlayerState(player);
+    }
+  });
+
+  socket.on('getRoomsList', () => {
+    const rooms = gameServer.getAllRooms();
+    socket.emit('updateRoomsList', rooms);
   });
 
   socket.on('disconnect', () => {
-    console.log('A user disconnected:', userId);
+    gameServer.removeVisitor(socket);
+    console.log('A user disconnected:', socket.id);
   });
 });
 
 server.listen(4000, () => {
   console.log('Socket.io server running on port 4000');
 });
-
-function generateUniqueUserId() {
-  // Générer un identifiant unique, par exemple, un UUID ou un timestamp
-  return 'user-' + Math.random().toString(36).substr(2, 9);
-}

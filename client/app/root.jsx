@@ -1,11 +1,21 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLocation,
+  useNavigate,
+} from 'react-router';
 
 import stylesheet from './app.css?url';
 import store from './redux/store';
-import { Provider } from 'react-redux';
-import { useEffect } from 'react';
+import { Provider, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { connectionAttempt } from './redux/socketSlice';
+import { connectionAttempt, emitJoinOrCreateRoom, selectIsConnected } from './redux/socketSlice';
+import { selectRoomName, selectUsername, setRoomName, setUsername } from './redux/roomInfoSlice';
 
 export const links = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -32,7 +42,7 @@ export function Layout({ children }) {
       </head>
       <body>
         <Provider store={store}>
-          <main className="flex items-center justify-center min-h-screen bg-red-950">
+          <main className="bg-red-800 min-h-screen">
             {children}
             <ScrollRestoration />
             <Scripts />
@@ -45,12 +55,55 @@ export function Layout({ children }) {
 
 export default function App() {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const username = useSelector((state) => selectUsername(state));
+  const room_name = useSelector((state) => selectRoomName(state));
+  const navigate = useNavigate();
+  const socketConnected = useSelector((state) => selectIsConnected(state));
+  const regex = /^\/([^\/]+)\/([^\/]+)$/;
+  const [checkRedirect, setCheckRedirect] = useState(false);
+  const [roomJoined, setRoomJoined] = useState(false);
 
   useEffect(() => {
+    // join or create room
+    if (
+      roomJoined ||
+      !socketConnected ||
+      location.pathname === '/' ||
+      location.pathname === '/room' ||
+      !checkRedirect
+    ) {
+      return;
+    }
+    dispatch(emitJoinOrCreateRoom({ room_name, username }));
+    setRoomJoined(true);
+  }, [socketConnected, username, location.pathname, checkRedirect]);
+
+  useEffect(() => {
+    // redirect
+    if (!username && location.pathname === '/room') {
+      navigate('/');
+    } else if (username && location.pathname === '/') {
+      navigate('/room');
+    } else if (location.pathname !== '/' && location.pathname !== '/room') {
+      // useless ?
+      const match = location.pathname.match(regex);
+      dispatch(setUsername(match[2]));
+      dispatch(setRoomName(match[1]));
+    }
+    setCheckRedirect(true);
+  }, [socketConnected, location.pathname]);
+
+  useEffect(() => {
+    // connect to socket
     dispatch(connectionAttempt());
   }, []);
 
-  return <Outlet />;
+  if (!socketConnected || !checkRedirect) {
+    return <div>Connecting...</div>;
+  } else {
+    return <Outlet />;
+  }
 }
 
 export function ErrorBoundary({ error }) {

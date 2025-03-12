@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setPseudo } from '../redux/pseudoSlice';
+import { setUsername } from '../redux/roomInfoSlice';
 import { useNavigate } from 'react-router';
 
 export function meta() {
@@ -8,47 +8,37 @@ export function meta() {
 }
 
 const Login = () => {
-  const [pseudo, setPseudoInput] = useState('');
+  const [pseudoInput, setPseudoInput] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  /* useEffect(() => {
-    console.log('Connecting to the server...');
-    const socket = io('http://localhost:4000');
-
-    socket.on('connect', () => {
-      console.log('Connection established with the server');
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Disconnected from the server');
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []); */
 
   const handleInputChange = (event) => {
     setPseudoInput(event.target.value);
   };
 
-  const handleLogin = () => {
-    if (pseudo.trim()) {
-      dispatch(setPseudo(pseudo));
+  const handleLogin = (event) => {
+    event.preventDefault();
+    if (pseudoInput.trim()) {
+      dispatch(setUsername(pseudoInput));
       navigate('/room');
     }
   };
 
   return (
-    <div className="flex flex-col space-y-2">
-      <label htmlFor="pseudo" className="text-lg font-medium text-gray-700">
-        Enter your pseudo:
-      </label>
-      <input type="text" id="pseudo" value={pseudo} onChange={handleInputChange} />
-      <button onClick={handleLogin} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-        Log in
-      </button>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h2 className="text-3xl mb-4">Your name</h2>
+        <form onSubmit={handleLogin}>
+          <input
+            type="text"
+            placeholder="Enter your pseudo"
+            value={pseudoInput}
+            onChange={handleInputChange}
+            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+          />
+          <button className="mt-4 w-full px-4 py-2 bg-red-500 rounded-lg hover:bg-red-950">Log in</button>
+        </form>
+      </div>
     </div>
   );
 };
