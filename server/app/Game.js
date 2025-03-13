@@ -8,6 +8,7 @@ class Game {
     this.state = 'WAITING';
     this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
+    this.startInterval = 3000
   }
 
   getRandomKey() {
@@ -41,8 +42,8 @@ class Game {
       if (player.tetrimino) {
         console.debug('TETRIMINOS:', player.tetrimino.position);
         if (!player.move([0, 1])) {
-          player.board.keepTetriminoOnBoard(player.tetrimino);
-          player.tetrimino = null;
+          // player.board.keepTetriminoOnBoard(player.tetrimino);
+          // player.tetrimino = null;
         }
       }
       this.manageTetriminosPlayers(player);
@@ -73,7 +74,13 @@ class Game {
     this.update();
     this.interval = setInterval(() => {
       this.update();
-    }, 5000);
+    }, this.startInterval);
+  }
+
+  startWithNewInterval(intervalTime) {
+    this.interval = setInterval(() => {
+      this.update();
+    }, intervalTime);
   }
 }
 

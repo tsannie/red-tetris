@@ -177,4 +177,10 @@ const CODE_COLOR = {
   t: "Black"
 };
 
-export { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS, CODE_COLOR};
+const STATE = {
+  ON_GAME: "on game", // on game
+  WAITING: "waiting", // on pre-game
+  FINISHED: "finished", // other
+};
+
+export { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS, CODE_COLOR, STATE};

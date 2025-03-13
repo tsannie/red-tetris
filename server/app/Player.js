@@ -1,3 +1,4 @@
+import { STATE } from "./const.js";
 import Tetrimino from "./Tetrimino.js";
 import { generateUniqueUserId } from "./utils.js";
 
@@ -10,6 +11,7 @@ class Player {
     this.board = null;
     this.n_tetriminos = 0;
     this.tetrimino = null;
+    this.state = STATE.FINISHED
   }
 
   updateScore(points) {
@@ -41,7 +43,14 @@ class Player {
   }
 
   move(vector) {
-    if (!this.canMove(vector)) return false;
+    if (!this.tetrimino) return false;
+    if (!this.canMove(vector)){
+      if (vector[0] == 0 && vector[1] == 1){
+        this.board.keepTetriminoOnBoard(this.tetrimino);
+        this.tetrimino = null;
+      }
+      return false;
+    }
     this.tetrimino.move(vector);
     return true;
   }
