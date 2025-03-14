@@ -70,7 +70,7 @@ export default function App() {
       roomJoined ||
       !socketConnected ||
       location.pathname === '/' ||
-      location.pathname === '/room' ||
+      location.pathname === '/rooms' ||
       !checkRedirect
     ) {
       return;
@@ -81,11 +81,11 @@ export default function App() {
 
   useEffect(() => {
     // redirect
-    if (!username && location.pathname === '/room') {
+    if (!username && location.pathname === '/rooms') {
       navigate('/');
     } else if (username && location.pathname === '/') {
-      navigate('/room');
-    } else if (location.pathname !== '/' && location.pathname !== '/room') {
+      navigate('/rooms');
+    } else if (location.pathname !== '/' && location.pathname !== '/rooms') {
       // useless ?
       const match = location.pathname.match(regex);
       dispatch(setUsername(match[2]));

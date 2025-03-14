@@ -16,7 +16,7 @@ const WaitingRoom = () => {
 
   return (
     <div className="w-full h-screen grid grid-rows-[15%_70%_15%]">
-      {/* Room Title */}
+      {/* Rooms Title */}
       <div className="flex items-center justify-center text-7xl font-bold">{roomName}</div>
 
       {/* Players List */}

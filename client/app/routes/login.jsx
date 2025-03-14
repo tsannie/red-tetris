@@ -20,7 +20,7 @@ const Login = () => {
     event.preventDefault();
     if (pseudoInput.trim()) {
       dispatch(setUsername(pseudoInput));
-      navigate('/room');
+      navigate('/rooms');
     }
   };
 
