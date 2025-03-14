@@ -167,4 +167,20 @@ const TETRIMINOS = {
   },
 };
 
-export { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS };
+const CODE_COLOR = {
+  c: "Cyan",
+  b: "Blue",
+  o: "Orange",
+  g: "Green",
+  p: "Purple",
+  r: "Red",
+  t: "Black"
+};
+
+const STATE = {
+  ON_GAME: "on game", // on game
+  WAITING: "waiting", // on pre-game
+  FINISHED: "finished", // other
+};
+
+export { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS, CODE_COLOR, STATE};

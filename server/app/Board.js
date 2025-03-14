@@ -1,34 +1,21 @@
-import { BOARD_HEIGHT, BOARD_WIDTH } from './const.js';
+import { BOARD_HEIGHT, BOARD_WIDTH } from "./const.js";
 
 class Board {
   constructor() {
-    this.grid = Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0));
+    this.grid = Array.from({ length: BOARD_HEIGHT }, () =>
+      Array(BOARD_WIDTH).fill(0)
+    );
   }
 
-  // exemple tetrimino.shape:
-  // [ [ 0, 1, 0 ],
-  //   [ 0, 1, 0 ],
-  //   [ 0, 1, 1 ] ]
-  // exemple tetrimino.position: [5, 18]
-  // this function will insert the tetrimino in the grid with char 't'
-  // with the '1' values of the shape at the position [5, 18]
   gridWithCurrentTetrimino(tetrimino, dev = false) {
     const grid = this.grid.map((row) => row.slice());
     const shape = tetrimino.getShape();
-    //if (dev)  console.log("try to insert tetrimino: ", shape);
 
     const shapeHeight = shape.length;
     const shapeWidth = shape[0].length;
-    // console.log('shapeHeight: ', shapeHeight);
-    // console.log('shapeWidth: ', shapeWidth);
     const centerX = Math.floor(shapeWidth / 2);
     const centerY = Math.floor(shapeHeight / 2);
-    // console.log('centerX: ', centerX);
-    // console.log('centerY: ', centerY);
-
     const [posX, posY] = tetrimino.position;
-    // console.log('posX: ', posX);
-    // console.log('posY: ', posY);
 
     for (let y = 0; y < shapeHeight; y++) {
       for (let x = 0; x < shapeWidth; x++) {
@@ -36,18 +23,22 @@ class Board {
           const gridX = posX - centerX + x;
           const gridY = posY - centerY + y;
 
-          if (gridX >= 0 && gridX < BOARD_WIDTH && gridY >= 0 && gridY < BOARD_HEIGHT) {
-            grid[gridY][gridX] = 't';
+          if (
+            gridX >= 0 &&
+            gridX < BOARD_WIDTH &&
+            gridY >= 0 &&
+            gridY < BOARD_HEIGHT
+          ) {
+            grid[gridY][gridX] = tetrimino.getColor()[0];
           }
         }
       }
     }
-    /*
     if (dev) {
       for (let y = 0; y < BOARD_HEIGHT; y++) {
         console.log(JSON.stringify(grid[y]));
       }
-    } */
+    }
     return grid;
   }
 
@@ -55,16 +46,59 @@ class Board {
   // et le rajouter au grid
   keepTetriminoOnBoard(tetrimino) {
     this.grid = this.gridWithCurrentTetrimino(tetrimino);
+    for (let y = 0; y < BOARD_HEIGHT; y++) {
+      if (
+        this.grid[y].filter((element) => element !== 0).length == BOARD_WIDTH
+      ) {
+        this.removeLineAndShiftDown(y);
+      }
+    }
   }
 
-  // cette fonction compte le nombre de 't' present sur le grid
+  removeLineAndShiftDown(lineIndex) {
+    // Supprimer la ligne spécifiée
+    for (let col = 0; col < BOARD_WIDTH; col++) {
+      this.grid[lineIndex][col] = 0;
+    }
+
+    // Faire descendre toutes les lignes au-dessus de la ligne supprimée
+    for (let row = lineIndex; row > 0; row--) {
+      for (let col = 0; col < BOARD_WIDTH; col++) {
+        this.grid[row][col] = this.grid[row - 1][col];
+      }
+    }
+
+    // Remplir la première ligne avec des zéros
+    for (let col = 0; col < BOARD_WIDTH; col++) {
+      this.grid[0][col] = 0;
+    }
+    this.addLineOfTetriminos()
+  }
+
+  addLineOfTetriminos() {
+    const penalites = Array(BOARD_WIDTH).fill('t');
+    console.log(penalites)
+    // Faire remonter toutes les lignes d'un cran
+    for (let row = BOARD_HEIGHT - 1; row > 0; row--) {
+      for (let col = 0; col < BOARD_WIDTH; col++) {
+        this.grid[row][col] = this.grid[row - 1][col];
+      }
+    }
+
+    // Ajouter la nouvelle ligne de tétriminos à la première ligne
+    for (let col = 0; col < BOARD_WIDTH; col++) {
+      this.grid[BOARD_HEIGHT - 1][col] = penalites[col];
+    }
+  }
+
+  // cette fonction compte le nombre de '0' present sur le grid
   // elle va permettre de savoir si un move est possible
   numberOfTOnGrid(grid) {
-    let number_of_t = 0;
+    let number_of_tetri = 0;
     for (let y = 0; y < BOARD_HEIGHT; y++) {
-      number_of_t += grid[y].filter((element) => element === 't').length;
+      number_of_tetri += grid[y].filter((element) => element !== 0).length;
     }
-    return number_of_t;
+    return number_of_tetri;
   }
 }
 
