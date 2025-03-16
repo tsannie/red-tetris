@@ -1,4 +1,5 @@
 import { BOARD_HEIGHT, BOARD_WIDTH } from "./const.js";
+import Tetrimino from "./Tetrimino.js";
 
 class Board {
   constructor() {
@@ -44,17 +45,22 @@ class Board {
 
   // appeler cette fonction lorsque un tetrimino est arrive a la collision
   // et le rajouter au grid
+  // renvoie un entier = nombre de ligne au autres joueurs
   keepTetriminoOnBoard(tetrimino) {
     this.grid = this.gridWithCurrentTetrimino(tetrimino);
+    let penalities = 0
     for (let y = 0; y < BOARD_HEIGHT; y++) {
       if (
-        this.grid[y].filter((element) => element !== 0).length == BOARD_WIDTH
+        this.grid[y].filter((element) => element !== 0 && element !== 't').length == BOARD_WIDTH
       ) {
         this.removeLineAndShiftDown(y);
+        penalities += 1
       }
     }
+    return penalities
   }
 
+  // appeler cette fonction pour chaque joueur
   removeLineAndShiftDown(lineIndex) {
     // Supprimer la ligne spécifiée
     for (let col = 0; col < BOARD_WIDTH; col++) {
@@ -72,16 +78,14 @@ class Board {
     for (let col = 0; col < BOARD_WIDTH; col++) {
       this.grid[0][col] = 0;
     }
-    this.addLineOfTetriminos()
   }
 
   addLineOfTetriminos() {
     const penalites = Array(BOARD_WIDTH).fill('t');
-    console.log(penalites)
     // Faire remonter toutes les lignes d'un cran
-    for (let row = BOARD_HEIGHT - 1; row > 0; row--) {
+    for (let row = 0; row < BOARD_HEIGHT - 1; row++) {
       for (let col = 0; col < BOARD_WIDTH; col++) {
-        this.grid[row][col] = this.grid[row - 1][col];
+        this.grid[row][col] = this.grid[row + 1][col];
       }
     }
 
