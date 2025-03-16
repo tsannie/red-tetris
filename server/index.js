@@ -37,7 +37,6 @@ io.on('connect', (socket) => {
   });
 
   socket.on('move', (direction) => {
-    console.log("move:", direction);
     if (!room || !player || direction_vector[direction] === undefined) return; // TODO also check if the game is started
     if (player.move(direction_vector[direction])) {
       room.updatePlayerState(player);
@@ -45,12 +44,17 @@ io.on('connect', (socket) => {
   });
 
   socket.on('rotate', () => {
-    console.log("rotate");
     if (!room || !player) return; // TODO also check if the game is started
     if (player.rotate()) {
       room.updatePlayerState(player);
     }
   });
+
+  socket.on('drop', () => {
+    if (!room || !player) return; // TODO also check if the game is started
+    player.drop();
+    room.updatePlayerState(player);
+  })
 
   socket.on('getRoomsList', () => {
     console.log("getRoomsList");
