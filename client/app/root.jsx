@@ -14,7 +14,7 @@ import store from './redux/store';
 import { Provider, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { connectionAttempt, emitJoinOrCreateRoom, selectIsConnected } from './redux/socketSlice';
+import { connectionAttempt, emitExitRoom, emitJoinOrCreateRoom, selectIsConnected } from './redux/socketSlice';
 import { selectRoomName, selectUsername, setRoomName, setUsername } from './redux/roomInfoSlice';
 
 export const links = () => [
@@ -70,26 +70,31 @@ export default function App() {
       roomJoined ||
       !socketConnected ||
       location.pathname === '/' ||
-      location.pathname === '/room' ||
-      !checkRedirect
+      location.pathname === '/rooms' ||
+      !checkRedirect ||
+      !username ||
+      !room_name
     ) {
       return;
     }
+    console.log('emitJoinOrCreateRoom', { room_name, username });
     dispatch(emitJoinOrCreateRoom({ room_name, username }));
     setRoomJoined(true);
-  }, [socketConnected, username, location.pathname, checkRedirect]);
+  }, [socketConnected, username, location.pathname, checkRedirect, room_name]);
 
   useEffect(() => {
     // redirect
-    if (!username && location.pathname === '/room') {
+    if (!username && location.pathname === '/rooms') {
       navigate('/');
     } else if (username && location.pathname === '/') {
-      navigate('/room');
-    } else if (location.pathname !== '/' && location.pathname !== '/room') {
-      // useless ?
+      navigate('/rooms');
+    } else if (location.pathname !== '/' && location.pathname !== '/rooms') {
       const match = location.pathname.match(regex);
       dispatch(setUsername(match[2]));
       dispatch(setRoomName(match[1]));
+    } else if ((location.pathname === '/' || location.pathname === '/rooms') && roomJoined) {
+      dispatch(emitExitRoom());
+      setRoomJoined(false);
     }
     setCheckRedirect(true);
   }, [socketConnected, location.pathname]);

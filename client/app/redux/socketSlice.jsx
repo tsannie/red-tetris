@@ -8,6 +8,7 @@ const initialState = {
 
 export const connectionAttempt = createAction('socket/connectionAttempt');
 export const emitJoinOrCreateRoom = createAction('socket/emitJoinOrCreateRoom');
+export const emitExitRoom = createAction('socket/emitExitRoom');
 export const emitMove = createAction('socket/emitMove');
 export const emitDrop = createAction('socket/emitDrop');
 export const emitRotate = createAction('socket/emitRotate');

@@ -1,4 +1,4 @@
-import { setAdminId, setPlayers, setRoomsList, setUserId } from './roomInfoSlice';
+import { setAdminId, setPlayers, setRoomName, setRoomsList, setUserId } from './roomInfoSlice';
 import { connect, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
@@ -37,6 +37,15 @@ const middleware = (store) => (next) => async (action) => {
     case 'socket/emitStart':
       if (socket) {
         socket.emit('startGame');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
+    case 'socket/emitExitRoom':
+      if (socket) {
+        socket.emit('exitRoom');
+        store.dispatch(setRoomName(null));
       } else {
         console.error('Socket not connected');
       }

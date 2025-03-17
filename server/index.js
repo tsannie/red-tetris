@@ -21,15 +21,21 @@ io.on('connect', (socket) => {
   gameServer.addVisitor(socket);
 
   socket.on('joinOrCreateRoom', (data) => {
-    console.log("joinOrCreateRoom");
     player = gameServer.createPlayer(data.username, socket);
     room = gameServer.joinOrCreateRoom(data.room_name, player);
 
     room.updateInfoRoom();
   });
 
+  socket.on('exitRoom', () => {
+    if (!room || !player) return;
+
+    gameServer.playerLeaveRoom(player, room);
+    room = null;
+    player = null;
+  });
+
   socket.on('startGame', () => {
-    console.log("startGame");
     if (!room || !player || room.admin_id !== player.id) return; // TODO check state of room
 
     room.startGame();
@@ -54,15 +60,19 @@ io.on('connect', (socket) => {
     if (!room || !player) return; // TODO also check if the game is started
     player.drop();
     room.updatePlayerState(player);
-  })
+  });
 
   socket.on('getRoomsList', () => {
-    console.log("getRoomsList");
+    console.log('getRoomsList');
     const rooms = gameServer.getAllRooms();
     socket.emit('updateRoomsList', rooms);
   });
 
   socket.on('disconnect', () => {
+    if (room && player) {
+      gameServer.playerLeaveRoom(player, room);
+    }
+
     gameServer.removeVisitor(socket);
     console.log('A user disconnected:', socket.id);
   });

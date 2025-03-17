@@ -4,7 +4,7 @@ import Cell from './Cell';
 const Board = ({ board_value }) => {
   return (
     <div
-      className="grid gap-0 border-4 border-red-900"
+      className="grid gap-0 border-2 border-white"
       style={{
         gridTemplateColumns: `repeat(${board_value[0].length}, 2.5rem)`,
         gridTemplateRows: `repeat(${board_value.length}, 2.5rem)`,

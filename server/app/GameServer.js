@@ -28,6 +28,26 @@ class GameServer {
     return player;
   }
 
+  playerLeaveRoom(player, room) {
+    const state_room = room.getState();
+    if (state_room === 'STARTED') {
+      return;
+      //TODO define. maybe change state of user to say he is disconnected ?
+    } else if (state_room === 'WAITING') {
+      room.removePlayer(player);
+      if (room.getNbPlayers() === 0) {
+        this.removeRoom(room);
+      } else {
+        if (player.id === room.admin_id) {
+          room.newAdmin();
+        } else {
+          room.updateInfoRoom();
+        }
+        this.updateRoomsList();
+      }
+    }
+  }
+
   deletePlayer(id) {
     this.players = this.players.filter((player) => player.id !== id);
   }
@@ -39,6 +59,11 @@ class GameServer {
   createRoom(name, playerAdmin) {
     this.rooms[name] = new Room(name, playerAdmin);
     return this.rooms[name];
+  }
+
+  removeRoom(room) {
+    delete this.rooms[room.name];
+    this.updateRoomsList();
   }
 
   getAllRooms() {
