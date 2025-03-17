@@ -5,10 +5,10 @@ import Tetrimino from './Tetrimino.js';
 class Game {
   constructor() {
     this.players = [];
-    this.state = 'WAITING';
+    this.state = "WAITING";
     this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
-    this.startInterval = 3000
+    this.startInterval = 3000;
   }
 
   getRandomKey() {
@@ -32,7 +32,9 @@ class Game {
   manageTetriminosPlayers(player) {
     this.updateTetriminosHistory(player);
     if (player.tetrimino === null) {
-      player.tetrimino = new Tetrimino(this.tetriminos_history[player.n_tetriminos]);
+      player.tetrimino = new Tetrimino(
+        this.tetriminos_history[player.n_tetriminos]
+      );
       player.n_tetriminos += 1;
     }
   }
@@ -40,28 +42,28 @@ class Game {
   update() {
     this.players.forEach((player) => {
       if (player.tetrimino) {
-        console.debug('TETRIMINOS:', player.tetrimino.position);
-        if (!player.move([0, 1])) {
-          // player.board.keepTetriminoOnBoard(player.tetrimino);
-          // player.tetrimino = null;
-        }
+        player.move([0, 1])
       }
       this.manageTetriminosPlayers(player);
     });
     this.players.forEach((player) => {
-      player.socket.emit('update', {
-        board: player.board.gridWithCurrentTetrimino(player.tetrimino, true),
+      player.socket.emit("update", {
+        board: player.board.gridWithCurrentTetrimino(player.tetrimino, false),
         score: player.score,
         currentTetrimino: player.tetrimino.getShape(),
-        nextTetriminos: this.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2),
+        nextTetriminos: this.tetriminos_history.slice(
+          player.n_tetriminos,
+          player.n_tetriminos + 2
+        ),
       });
     });
   }
 
   start(players) {
-    this.state = 'STARTED';
+    this.state = "STARTED";
     this.players = players;
     this.players.forEach((player) => {
+      player.game = this;
       player.score = 0;
       player.board = new Board();
       player.n_tetriminos = 0;
@@ -69,7 +71,7 @@ class Game {
     });
 
     this.players.forEach((player) => {
-      player.socket.emit('gameStarted');
+      player.socket.emit("gameStarted");
     });
     this.update();
     this.interval = setInterval(() => {
@@ -81,6 +83,14 @@ class Game {
     this.interval = setInterval(() => {
       this.update();
     }, intervalTime);
+  }
+
+  addPenalities(playerId) {
+    this.players.forEach((player) => {
+      if (!(player.id == playerId)) {
+        player.penalities()
+      }
+    });
   }
 }
 

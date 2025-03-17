@@ -11,7 +11,8 @@ class Player {
     this.board = null;
     this.n_tetriminos = 0;
     this.tetrimino = null;
-    this.state = STATE.FINISHED
+    this.game = null;
+    this.state = STATE.FINISHED;
   }
 
   updateScore(points) {
@@ -46,13 +47,30 @@ class Player {
     if (!this.tetrimino) return false;
     if (!this.canMove(vector)){
       if (vector[0] == 0 && vector[1] == 1){
-        this.board.keepTetriminoOnBoard(this.tetrimino);
+        const penalities = this.board.keepTetriminoOnBoard(this.tetrimino)
+        for (let i = 0; i < penalities; i++){
+          console.log("Emit Penalities")
+          this.game.addPenalities(this.id)
+          this.socket.emit("penalitiesOtherPlayer", this.id)
+        }
         this.tetrimino = null;
+        this.game.manageTetriminosPlayers(this)
       }
       return false;
     }
     this.tetrimino.move(vector);
     return true;
+  }
+
+  drop() {
+    const currentTetrimino = this.n_tetriminos
+    while (currentTetrimino == this.n_tetriminos) {
+      this.move([0, 1])
+    }
+  }
+
+  penalities() {
+    this.board.addLineOfTetriminos()
   }
 
   rotate() {
