@@ -53,10 +53,8 @@ const Game = () => {
   ];
 
   const another_exemple_date_tetri = [
-    [0, 0, 0, 0],
-    [0, 'o', 'o', 0],
-    [0, 'o', 'o', 0],
-    [0, 0, 0, 0],
+    ['o', 'o'],
+    ['o', 'o'],
   ];
 
   const exemple_data_leaderboard = [
