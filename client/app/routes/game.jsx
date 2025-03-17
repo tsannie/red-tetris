@@ -70,8 +70,8 @@ const Game = () => {
     return <WaitingRoom />;
   } else {
     return (
-      <div className="grid grid-cols-5 grid-rows-7 gap-0 h-screen max-w-screen-lg m-auto">
-        <div className="col-start-1 col-end-4 row-start-1 row-end-8 flex items-center justify-center">
+      <div className="grid grid-cols-5 grid-rows-7 gap-0 h-screen max-w-screen-lg m-auto overflow-hidden">
+        <div className="col-start-1 col-end-4 row-start-1 row-end-8 flex items-center justify-center ">
           <Board board_value={board} />
         </div>
         <div className="col-start-4 col-end-6 row-start-1 row-end-3">

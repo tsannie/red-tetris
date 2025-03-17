@@ -12,7 +12,7 @@ const Cell = ({ cell_value }) => {
     t: 'bg-black',
   };
 
-  return <div className={`w-10 h-10 border-1 border-black ${COLOR_CODE[cell_value]}`} />;
+  return <div className={`w-full h-full border border-black ${COLOR_CODE[cell_value]}`} />;
 };
 
 export default Cell;

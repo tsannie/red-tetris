@@ -6,8 +6,8 @@ const Board = ({ board_value }) => {
     <div
       className="grid gap-0 border-2 border-white"
       style={{
-        gridTemplateColumns: `repeat(${board_value[0].length}, 2.5rem)`,
-        gridTemplateRows: `repeat(${board_value.length}, 2.5rem)`,
+        gridTemplateColumns: `repeat(${board_value[0].length}, min(5vw, 1.7rem))`,
+        gridTemplateRows: `repeat(${board_value.length}, min(5vw, 1.7rem))`,
       }}
     >
       {board_value.flat().map((cell, index) => (
