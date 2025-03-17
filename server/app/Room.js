@@ -8,8 +8,18 @@ class Room {
     this.game = new Game();
   }
 
+  getNbPlayers() {
+    return this.players.length;
+  }
+
   getState() {
     return this.game.state;
+  }
+
+  newAdmin() {
+    if (this.getNbPlayers() === 0) return;
+    this.admin_id = this.players[0].id;
+    this.updateInfoRoom();
   }
 
   movePlayer(player, direction) {
@@ -22,6 +32,10 @@ class Room {
 
   addPlayer(player) {
     this.players.push(player);
+  }
+
+  removePlayer(player) {
+    this.players = this.players.filter((p) => p.id !== player.id);
   }
 
   updatePlayerState(player) {

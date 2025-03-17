@@ -6,6 +6,10 @@ import { emitGetRooms } from '../redux/socketSlice';
 import RoomTable from '../components/RoomTable';
 import CreationRoom from '../components/CreationRoom';
 
+export function meta() {
+  return [{ title: 'Rooms' }, { name: 'description', content: 'Rooms page' }];
+}
+
 const Rooms = () => {
   const username = useSelector((state) => selectUsername(state));
   const roomsList = useSelector((state) => selectRoomsList(state));

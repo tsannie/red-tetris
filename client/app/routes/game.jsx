@@ -5,6 +5,10 @@ import { emitDrop, emitJoinOrCreateRoom, emitMove, emitRotate } from '../redux/s
 import { useLocation } from 'react-router';
 import WaitingRoom from '../components/WaitingRoom';
 
+export function meta() {
+  return [{ title: 'Game' }, { name: 'description', content: 'Game page' }];
+}
+
 const Game = () => {
   const board = useSelector((state) => state.socket.board);
   const dispatch = useDispatch();
