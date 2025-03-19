@@ -3,10 +3,9 @@ import { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS } from './const.js';
 class Tetrimino {
   constructor(key) {
     this.shape = TETRIMINOS[key].shape;
-    this.color = TETRIMINOS[key].color;
-    this.position = [BOARD_WIDTH / 2,  -1]
+    this.color = TETRIMINOS[key].color[0];
+    this.position = [BOARD_WIDTH / 2, -1] // 0
     this.rotation = 0;
-    this.isInserting = true;
   }
 
   // Méthode statique pour créer une copie

@@ -40,12 +40,14 @@ class Game {
     }
   }
 
-  retrievePlayerScore() {
-    const score =  this.players.map(player => ({
-      pseudo: player.pseudo,
-      score: player.score,
+  retrievePlayerBoard(player) {
+    const otherPlayersGame =  this.players.filter(otherPlayer => otherPlayer !== player)
+    .map(otherPlayer => ({
+      pseudo: otherPlayer.pseudo,
+      state: otherPlayer.state,
+      grid: otherPlayer.grid,
     }));
-    return score
+    return otherPlayersGame
   }
 
   update() {
@@ -56,9 +58,9 @@ class Game {
       this.manageTetriminosPlayers(player);
     });
     this.players.forEach((player) => {
-      player.socket.emit("update", {
-        board: player.board.gridWithCurrentTetrimino(player.tetrimino, false),
-        score: this.retrievePlayerScore(),
+      player.socket.emit('update', {
+        board: player.gridWithCurrentTetriminoWithShadow(),
+        otherPlayers: this.retrievePlayerBoard(player),
         currentTetrimino: player.tetrimino.getShape(),
         nextTetriminos: this.tetriminos_history.slice(
           player.n_tetriminos,
@@ -86,7 +88,6 @@ class Game {
     this.players = players;
     this.players.forEach((player) => {
       player.game = this;
-      player.score = 0;
       player.board = new Board();
       player.n_tetriminos = 0;
       player.tetrimino = null;
