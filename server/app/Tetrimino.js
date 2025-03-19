@@ -4,7 +4,7 @@ class Tetrimino {
   constructor(key) {
     this.shape = TETRIMINOS[key].shape;
     this.color = TETRIMINOS[key].color[0];
-    this.position = [BOARD_WIDTH / 2, -1] // 0
+    this.position = [BOARD_WIDTH / 2, 1] // 0
     this.rotation = 0;
   }
 

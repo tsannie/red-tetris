@@ -51,7 +51,7 @@ class Board {
   }
 
   isTetriminoInsert(tetrimino) {
-    var numberOfBlock = 4
+    let numberOfBlock = 4
     if (this.numberOfTOnGrid(this.gridWithCurrentTetrimino(tetrimino)) === this.numberOfTOnGrid(this.grid) + numberOfBlock) {
       return true;
     }
@@ -121,7 +121,7 @@ class Board {
   }
 
   notFreePos(grid) {
-    var occupatedPos = new Array()
+    let occupatedPos = new Array()
     for (let y=0;y<BOARD_HEIGHT;y++){
       for (let x=0;x<BOARD_WIDTH;x++){
         if (grid[y][x] !== 0){
@@ -136,7 +136,7 @@ class Board {
   isOverwritingTetri(tetrimino){
     const occupatedPos = this.notFreePos(this.grid)
     const posTetrimino = this.notFreePos(new Board().gridWithCurrentTetrimino(tetrimino))
-    var isOverwriting = false
+    let isOverwriting = false
     posTetrimino.forEach((element) => {
       if (occupatedPos.includes(element)){
         isOverwriting = true

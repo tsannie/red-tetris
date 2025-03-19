@@ -18,6 +18,7 @@ class Player {
     let tetrimino_to_test = Tetrimino.clone(this.tetrimino);
     tetrimino_to_test.color = 's' + tetrimino_to_test.getColor()
     while (this.canMoveShadow(tetrimino_to_test)){
+      // console.log(this.pseudo, this.tetrimino.position)
       tetrimino_to_test.move([0, 1])
     }
     let grid = this.board.gridWithCurrentTetrimino(tetrimino_to_test)
@@ -38,7 +39,6 @@ class Player {
     const canMove = number_of_t_before_move === number_of_t_after_move
     if (!this.board.isTetriminoInsert(tetrimino)){
       if (this.board.isOverwritingTetri(tetrimino_to_test)){
-        this.game.gameFinished();
         return false;
       }
       return true;
@@ -58,7 +58,7 @@ class Player {
     const canMove = number_of_t_before_move === number_of_t_after_move
     if (!this.board.isTetriminoInsert(this.tetrimino)){
       if (this.board.isOverwritingTetri(tetrimino_to_test)){
-        this.game.gameFinished();
+        this.game.gameFinished(this.id);
         return false;
       }
       return true;
@@ -73,17 +73,18 @@ class Player {
       this.board.gridWithCurrentTetrimino(this.tetrimino)
     );
     const number_of_t_after_rotate = this.board.numberOfTOnGrid(
-      this.board.gridWithCurrentTetrimino(tetrimino_to_test)
+      this.board.gridWithCurrentTetrimino(tetrimino_to_test, this.grid, true)
     );
-    const canRotate = number_of_t_before_rotate >= number_of_t_after_rotate;
+    const canRotate = number_of_t_before_rotate === number_of_t_after_rotate;
+    
     if (this.board.isOverwritingTetri(tetrimino_to_test)){
       return false;
     }
-    return true
+    return canRotate
   }
 
   move(vector) {
-    if (!(this.game.state === "STARTED")) return false;
+    if (!(this.state === STATE.STARTED)) return false;
     if (!this.tetrimino) return false;
     if (!this.canMove(vector)){
       if (vector[0] == 0 && vector[1] == 1){
@@ -114,7 +115,7 @@ class Player {
   }
 
   rotate() {
-    if (!(this.game.state === "STARTED")) return false;
+    if (!(this.state === STATE.STARTED)) return false;
     if (!this.canRotate()) return false;
     this.tetrimino.rotate();
     return true;
