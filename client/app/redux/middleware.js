@@ -31,6 +31,13 @@ const middleware = (store) => (next) => async (action) => {
         socket.on('updateRoomsList', (data) => {
           store.dispatch(setRoomsList(data));
         });
+
+        socket.on('roomError', (data) => {
+          console.log('Room ERROR:', data.message);
+          /*  store.dispatch(setRoomJoined(false));
+          store.dispatch(setRoomName(null));
+          store.dispatch(setWaitResponse(false)); */
+        });
       }
       break;
 
