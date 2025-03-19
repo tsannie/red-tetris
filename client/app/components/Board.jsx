@@ -3,14 +3,14 @@ import Cell from './Cell';
 
 const Board = ({ board_value, size = 'normal' }) => {
   const sizeMap = {
-    big: 'min(5vw, 1.7rem)',
-    normal: 'min(3vw, 1rem)',
-    small: 'min(2vw, 0.7rem)',
+    big: 'clamp(0.7rem, 4vh, 4.5rem)',
+    normal: 'clamp(0.7rem, 3vh, 2.5rem)',
+    small: 'clamp(0.5rem, 0.7vh, 3rem)',
   };
 
   const sizeBorderMap = {
     big: 'border-4',
-    normal: 'border',
+    normal: 'border-0', // preview current/next game
     small: 'border-2',
   };
 

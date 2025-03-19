@@ -44,22 +44,15 @@ const Game = () => {
   }, []);
 
   const exemple_date_tetri = [
-    [0, 'p', 0],
-    ['p', 'p', 'p'],
+    ['p', 'p', 'p', 'p'],
+    ['p', 'p', 'p', 'p'],
+    ['p', 'p', 'p', 'p'],
   ];
 
   const another_exemple_date_tetri = [
-    ['y', 'y'],
-    ['y', 'y'],
-  ];
-
-  const exemple_data_leaderboard = [
-    { username: 'player1', score: 100 },
-    { username: 'player2', score: 200 },
-    { username: 'player3', score: 300 },
-    { username: 'player4', score: 400 },
-    { username: 'player5', score: 500 },
-    { username: 'player6', score: 600 },
+    ['y', 'y', 'y', 'y'],
+    ['y', 'y', 'y', 'y'],
+    ['y', 'y', 'y', 'y'],
   ];
 
   if (!board || !board.length) {
@@ -67,36 +60,37 @@ const Game = () => {
   } else {
     return (
       // grid 2 rows 60% 40%
-      <div
-        className="grid grid-cols-[60%_40%]
-      gap-0 h-screen max-w-screen-lg overflow-hidden items-center p-4"
-      >
-        <div className="flex flex-col items-center justify-center">
-          <Board board_value={board} size="big" />
-        </div>
-        <div className="flex flex-col justify-around items-center h-5/6">
-          <div className="flex items-center justify-around w-full border-4 border-white p-4">
-            <TetriminoDisplayBox tetrimino={exemple_date_tetri} title="Current" />
-            <TetriminoDisplayBox tetrimino={another_exemple_date_tetri} title="Next" />
-          </div>
-          <div className="flex flex-col items-center justify-center w-full border-4 border-white p-4">
-            <h2 className="text-4xl mb-4">Opponents</h2>
-            <div className="grid grid-rows-2 grid-cols-2 gap-4">
-              <div className="flex items-center justify-center flex-col">
-                <Board board_value={board} size="small" />
-                <h3 className="text-xl mt-2">player1</h3>
+      <div className="w-full h-full flex justify-center">
+        <div className="w-full h-full flex justify-center max-w-[3000px]">
+          <div className="flex flex-rows w-screen h-screen p-4 items-center justify-evenly">
+            <div className="flex items-center justify-center">
+              <Board board_value={board} size="big" />
+            </div>
+            <div className="flex flex-col justify-around items-center overflow-hidden w-md h-full max-h-[1500px]">
+              <div className="flex items-center justify-around border-4 border-white w-full p-4">
+                <TetriminoDisplayBox tetrimino={exemple_date_tetri} title="Current" />
+                <TetriminoDisplayBox tetrimino={another_exemple_date_tetri} title="Next" />
               </div>
-              <div className="flex items-center justify-center flex-col">
-                <Board board_value={board} size="small" />
-                <h3 className="text-xl mt-2">player2</h3>
-              </div>
-              <div className="flex items-center justify-center flex-col">
-                <Board board_value={board} size="small" />
-                <h3 className="text-xl mt-2">player3</h3>
-              </div>
-              <div className="flex items-center justify-center flex-col">
-                <Board board_value={board} size="small" />
-                <h3 className="text-xl mt-2">player4</h3>
+              <div className="flex flex-col items-center border-4 border-white p-4 ">
+                <h2 className="text-4xl mb-4">Opponents</h2>
+                <div className="grid grid-rows-2 grid-cols-2 gap-4">
+                  <div className="flex items-center justify-center flex-col">
+                    <Board board_value={board} size="small" />
+                    <h3 className="text-xl mt-2">player1</h3>
+                  </div>
+                  <div className="flex items-center justify-center flex-col">
+                    <Board board_value={board} size="small" />
+                    <h3 className="text-xl mt-2">player2</h3>
+                  </div>
+                  <div className="flex items-center justify-center flex-col">
+                    <Board board_value={board} size="small" />
+                    <h3 className="text-xl mt-2">player3</h3>
+                  </div>
+                  <div className="flex items-center justify-center flex-col">
+                    <Board board_value={board} size="small" />
+                    <h3 className="text-xl mt-2">player4</h3>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
