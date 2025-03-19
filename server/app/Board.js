@@ -8,8 +8,15 @@ class Board {
     );
   }
 
-  gridWithCurrentTetrimino(tetrimino, dev = false) {
-    const grid = this.grid.map((row) => row.slice());
+  isOnBoard(tetrimino) {
+    if (this.numberOfTOnGrid(new Board().gridWithCurrentTetrimino(tetrimino)) != 4) return false
+    return true
+  }
+
+
+  gridWithCurrentTetrimino(tetrimino, grid, dev) {
+    if (grid === undefined) grid = this.grid
+    grid = grid.map((row) => row.slice());
     const shape = tetrimino.getShape();
 
     const shapeHeight = shape.length;
@@ -30,7 +37,7 @@ class Board {
             gridY >= 0 &&
             gridY < BOARD_HEIGHT
           ) {
-            grid[gridY][gridX] = tetrimino.getColor()[0];
+            grid[gridY][gridX] = tetrimino.getColor();
           }
         }
       }
@@ -43,14 +50,9 @@ class Board {
     return grid;
   }
 
-  isTetriminoInstert(tetrimino) {
-    const shapeTetri = tetrimino.getShape()
-    var numberOfBlock = 0
-    for (let i = 0; i < shapeTetri.length; i++) {
-      numberOfBlock += shapeTetri[i].filter((element) => element != 0).length
-    }
+  isTetriminoInsert(tetrimino) {
+    let numberOfBlock = 4
     if (this.numberOfTOnGrid(this.gridWithCurrentTetrimino(tetrimino)) === this.numberOfTOnGrid(this.grid) + numberOfBlock) {
-      console.log("Tetrimino is totally Insert")
       return true;
     }
     return false;
@@ -119,7 +121,7 @@ class Board {
   }
 
   notFreePos(grid) {
-    var occupatedPos = new Array()
+    let occupatedPos = new Array()
     for (let y=0;y<BOARD_HEIGHT;y++){
       for (let x=0;x<BOARD_WIDTH;x++){
         if (grid[y][x] !== 0){
@@ -134,7 +136,7 @@ class Board {
   isOverwritingTetri(tetrimino){
     const occupatedPos = this.notFreePos(this.grid)
     const posTetrimino = this.notFreePos(new Board().gridWithCurrentTetrimino(tetrimino))
-    var isOverwriting = false
+    let isOverwriting = false
     posTetrimino.forEach((element) => {
       if (occupatedPos.includes(element)){
         isOverwriting = true
