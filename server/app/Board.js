@@ -43,6 +43,19 @@ class Board {
     return grid;
   }
 
+  isTetriminoInstert(tetrimino) {
+    const shapeTetri = tetrimino.getShape()
+    var numberOfBlock = 0
+    for (let i = 0; i < shapeTetri.length; i++) {
+      numberOfBlock += shapeTetri[i].filter((element) => element != 0).length
+    }
+    if (this.numberOfTOnGrid(this.gridWithCurrentTetrimino(tetrimino)) === this.numberOfTOnGrid(this.grid) + numberOfBlock) {
+      console.log("Tetrimino is totally Insert")
+      return true;
+    }
+    return false;
+  }
+
   // appeler cette fonction lorsque un tetrimino est arrive a la collision
   // et le rajouter au grid
   // renvoie un entier = nombre de ligne au autres joueurs
@@ -103,6 +116,31 @@ class Board {
       number_of_tetri += grid[y].filter((element) => element !== 0).length;
     }
     return number_of_tetri;
+  }
+
+  notFreePos(grid) {
+    var occupatedPos = new Array()
+    for (let y=0;y<BOARD_HEIGHT;y++){
+      for (let x=0;x<BOARD_WIDTH;x++){
+        if (grid[y][x] !== 0){
+          occupatedPos.push(String(y) + String(x))
+        }
+      }
+    }
+    return occupatedPos
+  }
+
+  // Cette fonction verifie que le tetrimino n'ecrase pas un tetrimino existant
+  isOverwritingTetri(tetrimino){
+    const occupatedPos = this.notFreePos(this.grid)
+    const posTetrimino = this.notFreePos(new Board().gridWithCurrentTetrimino(tetrimino))
+    var isOverwriting = false
+    posTetrimino.forEach((element) => {
+      if (occupatedPos.includes(element)){
+        isOverwriting = true
+      }
+    })
+    return isOverwriting;
   }
 }
 
