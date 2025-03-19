@@ -19,6 +19,7 @@ const middleware = (store) => (next) => async (action) => {
         });
 
         socket.on('update', (data) => {
+          console.log('update', data);
           store.dispatch(updateRoom(data));
         });
 
@@ -34,6 +35,7 @@ const middleware = (store) => (next) => async (action) => {
 
         socket.on('roomError', (data) => {
           console.log('Room ERROR:', data.message);
+          // TODO: Handle error
           /*  store.dispatch(setRoomJoined(false));
           store.dispatch(setRoomName(null));
           store.dispatch(setWaitResponse(false)); */
@@ -53,6 +55,7 @@ const middleware = (store) => (next) => async (action) => {
       if (socket) {
         socket.emit('exitRoom');
         store.dispatch(setRoomName(null));
+        store.dispatch(updateRoom([]));
       } else {
         console.error('Socket not connected');
       }

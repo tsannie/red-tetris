@@ -41,9 +41,11 @@ class GameServer {
         } else {
           room.updateInfoRoom();
         }
+        console.log('CA VA CRASHER');
         this.updateRoomsList();
       }
     }
+    console.log('Fin de la suppression');
   }
 
   deletePlayer(id) {
@@ -60,6 +62,8 @@ class GameServer {
   }
 
   removeRoom(room) {
+    if (!room) return;
+    this.rooms[room.name] = null;
     delete this.rooms[room.name];
     this.updateRoomsList();
   }
@@ -96,6 +100,7 @@ class GameServer {
 
   updateRoomsList() {
     const rooms = this.getAllRooms();
+    console.log('rooms', rooms);
     this.visitors.forEach((visitor) => {
       visitor.emit('updateRoomsList', rooms);
     });

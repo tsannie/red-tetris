@@ -5,11 +5,11 @@ import Tetrimino from './Tetrimino.js';
 class Game {
   constructor() {
     this.players = [];
-    this.state = "WAITING";
+    this.state = 'WAITING';
     this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
     this.gameInterval = 3000;
-    this.refreshInterval = 0
+    this.refreshInterval = 0;
   }
 
   getRandomKey() {
@@ -33,56 +33,51 @@ class Game {
   manageTetriminosPlayers(player) {
     this.updateTetriminosHistory(player);
     if (player.tetrimino === null) {
-      player.tetrimino = new Tetrimino(
-        this.tetriminos_history[player.n_tetriminos]
-      );
+      player.tetrimino = new Tetrimino(this.tetriminos_history[player.n_tetriminos]);
       player.n_tetriminos += 1;
     }
   }
 
   retrievePlayerScore() {
-    const score =  this.players.map(player => ({
+    const score = this.players.map((player) => ({
       pseudo: player.pseudo,
       score: player.score,
     }));
-    return score
+    return score;
   }
 
   update() {
     this.players.forEach((player) => {
       if (player.tetrimino) {
-        player.move([0, 1])
+        player.move([0, 1]);
       }
       this.manageTetriminosPlayers(player);
     });
     this.players.forEach((player) => {
-      player.socket.emit("update", {
+      player.socket.emit('update', {
         board: player.board.gridWithCurrentTetrimino(player.tetrimino, false),
         score: this.retrievePlayerScore(),
         currentTetrimino: player.tetrimino.getShape(),
-        nextTetriminos: this.tetriminos_history.slice(
-          player.n_tetriminos,
-          player.n_tetriminos + 2
-        ),
+        nextTetrimino: this.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2),
       });
     });
-    this.refreshInterval += 1
+    this.refreshInterval += 1;
     if (this.refreshInterval > 8) {
-      this.startWithNewInterval(this.gameInterval - 250)
-      this.refreshInterval = 0
+      this.startWithNewInterval(this.gameInterval - 250);
+      this.refreshInterval = 0;
     }
   }
 
   gameFinished() {
-    this.state = "FINISHED"
-    console.log("emit Finished")
+    this.state = 'FINISHED';
+    console.log('emit Finished');
     this.players.forEach((player) => {
-      player.socket.emit("gameFinished")
-    })
+      player.socket.emit('gameFinished');
+    });
   }
 
   start(players) {
-    this.state = "STARTED";
+    this.state = 'STARTED';
     this.players = players;
     this.players.forEach((player) => {
       player.game = this;
@@ -91,9 +86,9 @@ class Game {
       player.n_tetriminos = 0;
       player.tetrimino = null;
     });
-    
+
     this.players.forEach((player) => {
-      player.socket.emit("gameStarted");
+      player.socket.emit('gameStarted');
     });
     this.update();
     this.interval = setInterval(() => {
@@ -103,9 +98,9 @@ class Game {
 
   startWithNewInterval(intervalTime) {
     if (intervalTime < 250) return;
-    this.gameInterval = intervalTime
-    console.log("changement de rythme", this.gameInterval)
-    clearInterval(this.interval)
+    this.gameInterval = intervalTime;
+    console.log('changement de rythme', this.gameInterval);
+    clearInterval(this.interval);
     this.interval = setInterval(() => {
       this.update();
     }, this.gameInterval);
@@ -114,7 +109,7 @@ class Game {
   addPenalities(playerId) {
     this.players.forEach((player) => {
       if (!(player.id == playerId)) {
-        player.penalities()
+        player.penalities();
       }
     });
   }

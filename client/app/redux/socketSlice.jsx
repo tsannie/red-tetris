@@ -4,6 +4,8 @@ const initialState = {
   socketConnected: false,
   socket: null,
   board: [],
+  next: [],
+  current: [],
 };
 
 export const connectionAttempt = createAction('socket/connectionAttempt');
@@ -28,7 +30,12 @@ const socketSlice = createSlice({
       state.socket = null;
     },
     updateRoom: (state, { payload }) => {
+      //console.log('payload', payload);
       state.board = payload.board;
+      console.log('state.board', payload.board);
+      state.next = payload.nextTetrimino;
+      console.log('state.next', payload.nextTetrimino);
+      state.current = payload.currentTetrimino;
     },
   },
 });

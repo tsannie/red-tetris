@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 const CreationRoom = ({ handleSelectRoom }) => {
   const [roomInput, setRoomInput] = useState('');
-  const dispatch = useDispatch();
 
   const handleInputChange = (event) => {
     setRoomInput(event.target.value);
