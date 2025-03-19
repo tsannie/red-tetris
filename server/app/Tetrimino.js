@@ -4,8 +4,9 @@ class Tetrimino {
   constructor(key) {
     this.shape = TETRIMINOS[key].shape;
     this.color = TETRIMINOS[key].color;
-    this.position = [BOARD_WIDTH / 2, Math.ceil(this.shape[0].length / 2)];
+    this.position = [BOARD_WIDTH / 2,  -1]
     this.rotation = 0;
+    this.isInserting = true;
   }
 
   // Méthode statique pour créer une copie

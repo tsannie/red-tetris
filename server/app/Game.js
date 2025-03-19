@@ -8,7 +8,8 @@ class Game {
     this.state = "WAITING";
     this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
-    this.startInterval = 3000;
+    this.gameInterval = 3000;
+    this.refreshInterval = 0
   }
 
   getRandomKey() {
@@ -39,6 +40,14 @@ class Game {
     }
   }
 
+  retrievePlayerScore() {
+    const score =  this.players.map(player => ({
+      pseudo: player.pseudo,
+      score: player.score,
+    }));
+    return score
+  }
+
   update() {
     this.players.forEach((player) => {
       if (player.tetrimino) {
@@ -49,7 +58,7 @@ class Game {
     this.players.forEach((player) => {
       player.socket.emit("update", {
         board: player.board.gridWithCurrentTetrimino(player.tetrimino, false),
-        score: player.score,
+        score: this.retrievePlayerScore(),
         currentTetrimino: player.tetrimino.getShape(),
         nextTetriminos: this.tetriminos_history.slice(
           player.n_tetriminos,
@@ -57,6 +66,19 @@ class Game {
         ),
       });
     });
+    this.refreshInterval += 1
+    if (this.refreshInterval > 8) {
+      this.startWithNewInterval(this.gameInterval - 250)
+      this.refreshInterval = 0
+    }
+  }
+
+  gameFinished() {
+    this.state = "FINISHED"
+    console.log("emit Finished")
+    this.players.forEach((player) => {
+      player.socket.emit("gameFinished")
+    })
   }
 
   start(players) {
@@ -69,20 +91,24 @@ class Game {
       player.n_tetriminos = 0;
       player.tetrimino = null;
     });
-
+    
     this.players.forEach((player) => {
       player.socket.emit("gameStarted");
     });
     this.update();
     this.interval = setInterval(() => {
       this.update();
-    }, this.startInterval);
+    }, this.gameInterval);
   }
 
   startWithNewInterval(intervalTime) {
+    if (intervalTime < 250) return;
+    this.gameInterval = intervalTime
+    console.log("changement de rythme", this.gameInterval)
+    clearInterval(this.interval)
     this.interval = setInterval(() => {
       this.update();
-    }, intervalTime);
+    }, this.gameInterval);
   }
 
   addPenalities(playerId) {
