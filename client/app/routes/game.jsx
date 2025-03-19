@@ -1,11 +1,9 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
 import { emitDrop, emitJoinOrCreateRoom, emitMove, emitRotate } from '../redux/socketSlice';
-import { useLocation } from 'react-router';
 import WaitingRoom from '../components/WaitingRoom';
 import TetriminoDisplayBox from '../components/TetriminoDisplayBox';
-import LeaderBoard from '../components/LeaderBoard';
 
 export function meta() {
   return [{ title: 'Game' }, { name: 'description', content: 'Game page' }];
@@ -46,15 +44,13 @@ const Game = () => {
   }, []);
 
   const exemple_date_tetri = [
-    [0, 0, 0, 0],
-    ['c', 'c', 'c', 'c'],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
+    [0, 'p', 0],
+    ['p', 'p', 'p'],
   ];
 
   const another_exemple_date_tetri = [
-    ['o', 'o'],
-    ['o', 'o'],
+    ['y', 'y'],
+    ['y', 'y'],
   ];
 
   const exemple_data_leaderboard = [
@@ -70,18 +66,40 @@ const Game = () => {
     return <WaitingRoom />;
   } else {
     return (
-      <div className="grid grid-cols-5 grid-rows-7 gap-0 h-screen max-w-screen-lg m-auto overflow-hidden">
-        <div className="col-start-1 col-end-4 row-start-1 row-end-8 flex items-center justify-center ">
-          <Board board_value={board} />
+      // grid 2 rows 60% 40%
+      <div
+        className="grid grid-cols-[60%_40%]
+      gap-0 h-screen max-w-screen-lg overflow-hidden items-center p-4"
+      >
+        <div className="flex flex-col items-center justify-center">
+          <Board board_value={board} size="big" />
         </div>
-        <div className="col-start-4 col-end-6 row-start-1 row-end-3">
-          <TetriminoDisplayBox tetrimino={exemple_date_tetri} title="Current" />
-        </div>
-        <div className="col-start-4 col-end-6 row-start-3 row-end-5 ">
-          <TetriminoDisplayBox tetrimino={another_exemple_date_tetri} title="Next" />
-        </div>
-        <div className="col-start-4 col-end-6 row-start-5 row-end-8 ">
-          <LeaderBoard players={exemple_data_leaderboard} />
+        <div className="flex flex-col justify-around items-center h-5/6">
+          <div className="flex items-center justify-around w-full border-4 border-white p-4">
+            <TetriminoDisplayBox tetrimino={exemple_date_tetri} title="Current" />
+            <TetriminoDisplayBox tetrimino={another_exemple_date_tetri} title="Next" />
+          </div>
+          <div className="flex flex-col items-center justify-center w-full border-4 border-white p-4">
+            <h2 className="text-4xl mb-4">Opponents</h2>
+            <div className="grid grid-rows-2 grid-cols-2 gap-4">
+              <div className="flex items-center justify-center flex-col">
+                <Board board_value={board} size="small" />
+                <h3 className="text-xl mt-2">player1</h3>
+              </div>
+              <div className="flex items-center justify-center flex-col">
+                <Board board_value={board} size="small" />
+                <h3 className="text-xl mt-2">player2</h3>
+              </div>
+              <div className="flex items-center justify-center flex-col">
+                <Board board_value={board} size="small" />
+                <h3 className="text-xl mt-2">player3</h3>
+              </div>
+              <div className="flex items-center justify-center flex-col">
+                <Board board_value={board} size="small" />
+                <h3 className="text-xl mt-2">player4</h3>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
