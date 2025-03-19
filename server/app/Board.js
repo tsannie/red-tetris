@@ -8,8 +8,15 @@ class Board {
     );
   }
 
-  gridWithCurrentTetrimino(tetrimino, dev = false) {
-    const grid = this.grid.map((row) => row.slice());
+  isOnBoard(tetrimino) {
+    if (this.numberOfTOnGrid(new Board().gridWithCurrentTetrimino(tetrimino)) != 4) return false
+    return true
+  }
+
+
+  gridWithCurrentTetrimino(tetrimino, grid, dev) {
+    if (grid === undefined) grid = this.grid
+    grid = grid.map((row) => row.slice());
     const shape = tetrimino.getShape();
 
     const shapeHeight = shape.length;
@@ -30,7 +37,7 @@ class Board {
             gridY >= 0 &&
             gridY < BOARD_HEIGHT
           ) {
-            grid[gridY][gridX] = tetrimino.getColor()[0];
+            grid[gridY][gridX] = tetrimino.getColor();
           }
         }
       }
@@ -43,14 +50,9 @@ class Board {
     return grid;
   }
 
-  isTetriminoInstert(tetrimino) {
-    const shapeTetri = tetrimino.getShape()
-    var numberOfBlock = 0
-    for (let i = 0; i < shapeTetri.length; i++) {
-      numberOfBlock += shapeTetri[i].filter((element) => element != 0).length
-    }
+  isTetriminoInsert(tetrimino) {
+    var numberOfBlock = 4
     if (this.numberOfTOnGrid(this.gridWithCurrentTetrimino(tetrimino)) === this.numberOfTOnGrid(this.grid) + numberOfBlock) {
-      console.log("Tetrimino is totally Insert")
       return true;
     }
     return false;

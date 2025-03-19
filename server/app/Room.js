@@ -40,9 +40,13 @@ class Room {
 
   updatePlayerState(player) {
     player.socket.emit('update', {
-      board: player.board.gridWithCurrentTetrimino(player.tetrimino),
-      score: player.score,
+      board: player.gridWithCurrentTetriminoWithShadow(),
+      otherPlayers: player.game.retrievePlayerBoard(player),
       currentTetrimino: player.tetrimino.getShape(),
+      nextTetriminos: player.game.tetriminos_history.slice(
+        player.n_tetriminos,
+        player.n_tetriminos + 2
+      ),
     });
   }
 
