@@ -28,7 +28,16 @@ class Player {
     const number_of_t_after_move = this.board.numberOfTOnGrid(
       this.board.gridWithCurrentTetrimino(tetrimino_to_test)
     );
-    return number_of_t_before_move === number_of_t_after_move;
+    const canMove = number_of_t_before_move === number_of_t_after_move
+    if (this.tetrimino.isInserting){
+      console.log("overwriting?", this.board.isOverwritingTetri(tetrimino_to_test), "canMove", canMove, "isinserting?", this.tetrimino.isInserting)
+      if (this.board.isOverwritingTetri(tetrimino_to_test)){
+        this.game.gameFinished();
+        return false;
+      }
+      return true;
+    }
+    return canMove
   }
 
   canRotate() {
@@ -44,6 +53,7 @@ class Player {
   }
 
   move(vector) {
+    if (!(this.game.state === "STARTED")) return false;
     if (!this.tetrimino) return false;
     if (!this.canMove(vector)){
       if (vector[0] == 0 && vector[1] == 1){
@@ -59,6 +69,8 @@ class Player {
       return false;
     }
     this.tetrimino.move(vector);
+    if (this.tetrimino.isInserting && this.board.isTetriminoInstert(this.tetrimino))
+      this.tetrimino.isInserting = false
     return true;
   }
 
@@ -74,6 +86,7 @@ class Player {
   }
 
   rotate() {
+    if (!(this.game.state === "STARTED")) return false;
     if (!this.canRotate()) return false;
     this.tetrimino.rotate();
     return true;
