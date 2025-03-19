@@ -168,7 +168,7 @@ const TETRIMINOS = {
 };
 
 const STATE = {
-  ON_GAME: 'on game', // on game
+  STARTED: 'started', // on game
   WAITING: 'waiting', // on pre-game
   FINISHED: 'finished', // other
 };

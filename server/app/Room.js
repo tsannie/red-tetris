@@ -1,3 +1,4 @@
+import { STATE } from './const.js';
 import Game from './Game.js';
 
 class Room {
@@ -39,6 +40,7 @@ class Room {
   }
 
   updatePlayerState(player) {
+    if (!(player.state === STATE.STARTED)) return;
     player.socket.emit('update', {
       board: player.gridWithCurrentTetriminoWithShadow(),
       otherPlayers: player.game.retrievePlayerBoard(player),
