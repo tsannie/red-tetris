@@ -148,6 +148,13 @@ class Game {
       }
     });
   }
+
+  delete() {
+    clearInterval(this.interval);
+    this.players = [];
+    this.state = STATE.WAITING;
+    this.tetriminos_history = [];
+  }
 }
 
 export default Game;

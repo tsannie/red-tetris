@@ -1,5 +1,6 @@
 import Room from './Room.js';
 import Player from './Player.js';
+import { STATE } from './const.js';
 
 class GameServer {
   constructor() {
@@ -30,10 +31,9 @@ class GameServer {
 
   playerLeaveRoom(player, room) {
     const state_room = room.getState();
-    if (state_room === 'WAITING' || state_room === 'STARTED') {
+    if (state_room === STATE.WAITING || state_room === STATE.STARTED) {
       room.removePlayer(player);
       if (room.getNbPlayers() === 0) {
-        console.log('remove room', room.name);
         this.removeRoom(room);
       } else {
         if (player.id === room.admin_id) {
@@ -41,11 +41,9 @@ class GameServer {
         } else {
           room.updateInfoRoom();
         }
-        console.log('CA VA CRASHER');
-        this.updateRoomsList();
       }
+      this.updateRoomsList();
     }
-    console.log('Fin de la suppression');
   }
 
   deletePlayer(id) {
@@ -63,9 +61,9 @@ class GameServer {
 
   removeRoom(room) {
     if (!room) return;
-    this.rooms[room.name] = null;
-    delete this.rooms[room.name];
-    this.updateRoomsList();
+    const room_name = room.name;
+    room.deleteGame();
+    delete this.rooms[room_name];
   }
 
   getAllRooms() {
@@ -92,7 +90,7 @@ class GameServer {
 
   roomIsStarted(name) {
     const room_to_join = this.getRoomByName(name);
-    if (room_to_join && room_to_join.getState() !== 'WAITING') {
+    if (room_to_join && room_to_join.getState() !== STATE.WAITING) {
       return true;
     }
     return false;

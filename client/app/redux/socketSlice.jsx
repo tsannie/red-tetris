@@ -32,9 +32,7 @@ const socketSlice = createSlice({
     updateRoom: (state, { payload }) => {
       //console.log('payload', payload);
       state.board = payload.board;
-      console.log('state.board', payload.board);
       state.next = payload.nextTetrimino;
-      console.log('state.next', payload.nextTetrimino);
       state.current = payload.currentTetrimino;
     },
   },

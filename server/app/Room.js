@@ -9,6 +9,15 @@ class Room {
     this.game = new Game();
   }
 
+  deleteGame() {
+    this.game.delete();
+    delete this.game;
+    this.game = null;
+    this.players = [];
+    this.admin_id = null;
+    this.name = null;
+  }
+
   getNbPlayers() {
     return this.players.length;
   }
@@ -45,10 +54,7 @@ class Room {
       board: player.gridWithCurrentTetriminoWithShadow(),
       otherPlayers: player.game.retrievePlayerBoard(player),
       currentTetrimino: player.tetrimino.getShape(),
-      nextTetriminos: player.game.tetriminos_history.slice(
-        player.n_tetriminos,
-        player.n_tetriminos + 2
-      ),
+      nextTetriminos: player.game.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2),
     });
   }
 

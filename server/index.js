@@ -22,7 +22,6 @@ io.on('connect', (socket) => {
 
   socket.on('joinOrCreateRoom', (data) => {
     if (gameServer.roomIsStarted(data.room_name)) {
-      console.log('roomIsStarted', data.room_name);
       socket.emit('roomError', { message: 'Room is already started or finished' });
       return;
     } else if (gameServer.roomIsFull(data.room_name)) {
