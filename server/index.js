@@ -74,7 +74,6 @@ io.on('connect', (socket) => {
   });
 
   socket.on('getRoomsList', () => {
-    console.log('getRoomsList');
     const rooms = gameServer.getAllRooms();
     socket.emit('updateRoomsList', rooms);
   });

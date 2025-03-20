@@ -18,7 +18,6 @@ class Player {
     let tetrimino_to_test = Tetrimino.clone(this.tetrimino);
     tetrimino_to_test.color = 's' + tetrimino_to_test.getColor()
     while (this.canMoveShadow(tetrimino_to_test)){
-      // console.log(this.pseudo, this.tetrimino.position)
       tetrimino_to_test.move([0, 1])
     }
     let grid = this.board.gridWithCurrentTetrimino(tetrimino_to_test)
@@ -73,7 +72,7 @@ class Player {
       this.board.gridWithCurrentTetrimino(this.tetrimino)
     );
     const number_of_t_after_rotate = this.board.numberOfTOnGrid(
-      this.board.gridWithCurrentTetrimino(tetrimino_to_test, this.grid, true)
+      this.board.gridWithCurrentTetrimino(tetrimino_to_test)
     );
     const canRotate = number_of_t_before_rotate === number_of_t_after_rotate;
     
@@ -90,7 +89,6 @@ class Player {
       if (vector[0] == 0 && vector[1] == 1){
         const penalities = this.board.keepTetriminoOnBoard(this.tetrimino)
         for (let i = 0; i < penalities; i++){
-          console.log("Emit Penalities")
           this.game.addPenalities(this.id)
           this.socket.emit("penalitiesOtherPlayer", this.id)
         }

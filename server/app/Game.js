@@ -21,28 +21,25 @@ class Game {
 
   updateTetriminosHistory(player) {
     let n_tetriminos_to_add = 0;
-    if (this.tetriminos_history.length === 0) {
-      n_tetriminos_to_add = 2;
-    } else if (player.n_tetriminos + 2 > this.tetriminos_history.length) {
-      n_tetriminos_to_add = 1;
+    if (player.n_tetriminos + 2 > this.tetriminos_history.length) {
+      n_tetriminos_to_add = player.n_tetriminos + 2 - this.tetriminos_history.length;
     }
 
     for (let i = 0; i < n_tetriminos_to_add; i++) {
-      this.tetriminos_history.push(this.getRandomKey());
+      this.tetriminos_history.push(new Tetrimino(this.getRandomKey()));
     }
   }
 
   manageTetriminosPlayers(player) {
-    this.updateTetriminosHistory(player);
     if (player.tetrimino === null) {
-      let newTetri = new Tetrimino(this.tetriminos_history[player.n_tetriminos]);
+      let newTetri = Tetrimino.clone(this.tetriminos_history[player.n_tetriminos]);
       let numberOfBlockBefore = player.board.numberOfTOnGrid(player.board.grid);
       let numberOfBlockAfter = player.board.numberOfTOnGrid(player.board.gridWithCurrentTetrimino(newTetri));
-      // console.log(n)
       if (numberOfBlockAfter !== numberOfBlockBefore + 4) this.gameFinished(player.id);
       player.tetrimino = newTetri;
       player.n_tetriminos += 1;
     }
+    this.updateTetriminosHistory(player);
   }
 
   retrievePlayerBoard(player) {
@@ -51,7 +48,7 @@ class Game {
       .map((otherPlayer) => ({
         pseudo: otherPlayer.pseudo,
         state: otherPlayer.state,
-        grid: otherPlayer.grid,
+        grid: otherPlayer.board.grid,
       }));
     return otherPlayersGame;
   }
@@ -68,8 +65,8 @@ class Game {
         player.socket.emit('update', {
           board: player.gridWithCurrentTetriminoWithShadow(),
           otherPlayers: this.retrievePlayerBoard(player),
-          currentTetrimino: player.tetrimino.getShape(),
-          nextTetrimino: this.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2),
+          currentTetrimino: player.tetrimino.getShapeWithColor(),
+          nextTetriminos: this.nextTetriminosWithColor(player),
         });
       }
     });
@@ -80,32 +77,39 @@ class Game {
     }
   }
 
+  nextTetriminosWithColor(player) {
+    let nextTetriminos = this.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2);
+    nextTetriminos[0] = nextTetriminos[0].getShapeWithColor();
+    nextTetriminos[1] = nextTetriminos[1].getShapeWithColor();
+    return nextTetriminos;
+  }
+
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
-    console.log('emit finished');
+    // console.log("emit finished")
     player.state = STATE.FINISHED;
     player.socket.emit('finished', {
       idPlayer: player.id,
       pseudo: player.pseudo,
     });
     if (this.typeOfGame == 'SOLO') {
-      console.log('SOLO');
       this.state = STATE.FINISHED;
-      console.log('emit gameFinished');
+      // console.log("emit gameFinished")
+      clearInterval(this.interval);
       player.socket.emit('gameFinished');
     } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) {
-      console.log('MULTI');
       this.players.forEach((playerInGame) => {
         if (playerInGame.state == STATE.STARTED) {
           playerInGame.state = STATE.FINISHED;
-          console.log('emit finished');
+          // console.log("emit finished")
           playerInGame.socket.emit('finished', {
             idPlayer: playerInGame.id,
             pseudo: playerInGame.pseudo,
           });
         }
       });
-      console.log('emit gameFinished');
+      // console.log("emit gameFinished")
+      clearInterval(this.interval);
       player.socket.emit('gameFinished');
     }
   }
@@ -120,8 +124,8 @@ class Game {
       player.n_tetriminos = 0;
       player.tetrimino = null;
       player.state = STATE.STARTED;
+      this.updateTetriminosHistory(player);
     });
-
     this.players.forEach((player) => {
       player.socket.emit('gameStarted');
     });
@@ -134,7 +138,6 @@ class Game {
   startWithNewInterval(intervalTime) {
     if (intervalTime < 250) return;
     this.gameInterval = intervalTime;
-    console.log('changement de rythme', this.gameInterval);
     clearInterval(this.interval);
     this.interval = setInterval(() => {
       this.update();
