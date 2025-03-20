@@ -6,6 +6,7 @@ const initialState = {
   board: [],
   next: [],
   current: [],
+  otherPlayers: [],
 };
 
 export const connectionAttempt = createAction('socket/connectionAttempt');
@@ -34,6 +35,7 @@ const socketSlice = createSlice({
       state.board = payload.board;
       state.next = payload.nextTetrimino;
       state.current = payload.currentTetrimino;
+      state.otherPlayers = payload.otherPlayers;
     },
   },
 });
