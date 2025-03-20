@@ -99,6 +99,20 @@ export default function App() {
     setCheckRedirect(true);
   }, [socketConnected, location.pathname]);
 
+  // detect leave room
+  useEffect(() => {
+    // join or create room
+    if (
+      socketConnected &&
+      roomJoined &&
+      username &&
+      room_name &&
+      (location.pathname === '/' || location.pathname === '/rooms')
+    ) {
+      //dispatch(emitExitRoom());
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     // connect to socket
     dispatch(connectionAttempt());

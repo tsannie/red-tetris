@@ -4,6 +4,9 @@ const initialState = {
   socketConnected: false,
   socket: null,
   board: [],
+  next: [],
+  current: [],
+  otherPlayers: [],
 };
 
 export const connectionAttempt = createAction('socket/connectionAttempt');
@@ -29,11 +32,23 @@ const socketSlice = createSlice({
     },
     updateRoom: (state, { payload }) => {
       state.board = payload.board;
+      state.next = payload.nextTetriminos[0] = payload.nextTetriminos[0].map((row) =>
+        row.map((cell) => (cell === 0 ? 's' : cell))
+      );
+      state.current = payload.currentTetrimino.map((row) => row.map((cell) => (cell === 0 ? 's' : cell)));
+
+      state.otherPlayers = payload.otherPlayers;
+    },
+    reset: (state) => {
+      state.board = [];
+      state.next = [];
+      state.current = [];
+      state.otherPlayers = [];
     },
   },
 });
 
-export const { connect, disconnect, updateRoom } = socketSlice.actions;
+export const { connect, disconnect, updateRoom, reset } = socketSlice.actions;
 
 export const selectIsConnected = (state) => state.socket.socketConnected;
 

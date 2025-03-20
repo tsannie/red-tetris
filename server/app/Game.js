@@ -5,13 +5,13 @@ import Tetrimino from './Tetrimino.js';
 
 class Game {
   constructor() {
-    this.typeOfGame = "SOLO" // "SOLO" OU "MULTI"
+    this.typeOfGame = 'SOLO'; // "SOLO" OU "MULTI"
     this.players = [];
     this.state = STATE.WAITING;
     this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
     this.gameInterval = 3000;
-    this.refreshInterval = 0
+    this.refreshInterval = 0;
   }
 
   getRandomKey() {
@@ -21,8 +21,8 @@ class Game {
 
   updateTetriminosHistory(player) {
     let n_tetriminos_to_add = 0;
-    if (player.n_tetriminos + 2 > this.tetriminos_history.length){
-      n_tetriminos_to_add = (player.n_tetriminos + 2) - this.tetriminos_history.length
+    if (player.n_tetriminos + 2 > this.tetriminos_history.length) {
+      n_tetriminos_to_add = player.n_tetriminos + 2 - this.tetriminos_history.length;
     }
 
     for (let i = 0; i < n_tetriminos_to_add; i++) {
@@ -51,19 +51,20 @@ class Game {
   }
 
   retrievePlayerBoard(player) {
-    const otherPlayersGame =  this.players.filter(otherPlayer => otherPlayer !== player)
-    .map(otherPlayer => ({
-      pseudo: otherPlayer.pseudo,
-      state: otherPlayer.state,
-      grid: otherPlayer.board.grid,
-    }));
-    return otherPlayersGame
+    const otherPlayersGame = this.players
+      .filter((otherPlayer) => otherPlayer !== player)
+      .map((otherPlayer) => ({
+        pseudo: otherPlayer.pseudo,
+        state: otherPlayer.state,
+        grid: otherPlayer.board.grid,
+      }));
+    return otherPlayersGame;
   }
 
   update() {
     this.players.forEach((player) => {
       if (player.tetrimino) {
-        player.move([0, 1])
+        player.move([0, 1]);
       }
       this.manageTetriminosPlayers(player);
     });
@@ -77,55 +78,52 @@ class Game {
         });
       }
     });
-    this.refreshInterval += 1
+    this.refreshInterval += 1;
     if (this.refreshInterval > 8) {
-      this.startWithNewInterval(this.gameInterval - 250)
-      this.refreshInterval = 0
+      this.startWithNewInterval(this.gameInterval - 250);
+      this.refreshInterval = 0;
     }
   }
 
   nextTetriminosWithColor(player) {
-    let nextTetriminos = this.tetriminos_history.slice(
-      player.n_tetriminos,
-      player.n_tetriminos + 2
-    )
-    nextTetriminos[0] = nextTetriminos[0].getShapeWithColor()
-    nextTetriminos[1] = nextTetriminos[1].getShapeWithColor()
-    return nextTetriminos
+    let nextTetriminos = this.tetriminos_history.slice(player.n_tetriminos, player.n_tetriminos + 2);
+    nextTetriminos[0] = nextTetriminos[0].getShapeWithColor();
+    nextTetriminos[1] = nextTetriminos[1].getShapeWithColor();
+    return nextTetriminos;
   }
 
   gameFinished(playerId) {
-    let player = this.players.find(player => player.id === playerId)
+    let player = this.players.find((player) => player.id === playerId);
     // console.log("emit finished")
-    player.state = STATE.FINISHED
+    player.state = STATE.FINISHED;
     player.socket.emit('finished', {
       idPlayer: player.id,
-      pseudo: player.pseudo
-    })
-    if (this.typeOfGame == "SOLO"){
-      this.state = STATE.FINISHED
+      pseudo: player.pseudo,
+    });
+    if (this.typeOfGame == 'SOLO') {
+      this.state = STATE.FINISHED;
       // console.log("emit gameFinished")
-      clearInterval(this.interval)
-      player.socket.emit("gameFinished")
-    } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1){
+      clearInterval(this.interval);
+      player.socket.emit('gameFinished');
+    } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) {
       this.players.forEach((playerInGame) => {
-        if (playerInGame.state == STATE.STARTED){
-          playerInGame.state = STATE.FINISHED
+        if (playerInGame.state == STATE.STARTED) {
+          playerInGame.state = STATE.FINISHED;
           // console.log("emit finished")
           playerInGame.socket.emit('finished', {
             idPlayer: playerInGame.id,
-            pseudo: playerInGame.pseudo
-          })
+            pseudo: playerInGame.pseudo,
+          });
         }
-      })
+      });
       // console.log("emit gameFinished")
-      clearInterval(this.interval)
-      player.socket.emit("gameFinished")
+      clearInterval(this.interval);
+      player.socket.emit('gameFinished');
     }
   }
 
   start(players) {
-    if (players.length > 1) this.typeOfGame="MULTI"
+    if (players.length > 1) this.typeOfGame = 'MULTI';
     this.state = STATE.STARTED;
     this.players = players;
     this.players.forEach((player) => {
@@ -133,11 +131,11 @@ class Game {
       player.board = new Board();
       player.n_tetriminos = 0;
       player.tetrimino = null;
-      player.state = STATE.STARTED
-      this.updateTetriminosHistory(player)
+      player.state = STATE.STARTED;
+      this.updateTetriminosHistory(player);
     });
     this.players.forEach((player) => {
-      player.socket.emit("gameStarted");
+      player.socket.emit('gameStarted');
     });
     this.update();
     this.interval = setInterval(() => {
@@ -147,8 +145,8 @@ class Game {
 
   startWithNewInterval(intervalTime) {
     if (intervalTime < 250) return;
-    this.gameInterval = intervalTime
-    clearInterval(this.interval)
+    this.gameInterval = intervalTime;
+    clearInterval(this.interval);
     this.interval = setInterval(() => {
       this.update();
     }, this.gameInterval);
@@ -157,9 +155,16 @@ class Game {
   addPenalities(playerId) {
     this.players.forEach((player) => {
       if (!(player.id == playerId)) {
-        player.penalities()
+        player.penalities();
       }
     });
+  }
+
+  delete() {
+    clearInterval(this.interval);
+    this.players = [];
+    this.state = STATE.WAITING;
+    this.tetriminos_history = [];
   }
 }
 

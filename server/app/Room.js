@@ -9,6 +9,15 @@ class Room {
     this.game = new Game();
   }
 
+  deleteGame() {
+    this.game.delete();
+    delete this.game;
+    this.game = null;
+    this.players = [];
+    this.admin_id = null;
+    this.name = null;
+  }
+
   getNbPlayers() {
     return this.players.length;
   }

@@ -1,5 +1,6 @@
 import Room from './Room.js';
 import Player from './Player.js';
+import { STATE } from './const.js';
 
 class GameServer {
   constructor() {
@@ -30,10 +31,7 @@ class GameServer {
 
   playerLeaveRoom(player, room) {
     const state_room = room.getState();
-    if (state_room === 'STARTED') {
-      return;
-      //TODO define. maybe change state of user to say he is disconnected ?
-    } else if (state_room === 'WAITING') {
+    if (state_room === STATE.WAITING || state_room === STATE.STARTED) {
       room.removePlayer(player);
       if (room.getNbPlayers() === 0) {
         this.removeRoom(room);
@@ -43,8 +41,8 @@ class GameServer {
         } else {
           room.updateInfoRoom();
         }
-        this.updateRoomsList();
       }
+      this.updateRoomsList();
     }
   }
 
@@ -62,8 +60,10 @@ class GameServer {
   }
 
   removeRoom(room) {
-    delete this.rooms[room.name];
-    this.updateRoomsList();
+    if (!room) return;
+    const room_name = room.name;
+    room.deleteGame();
+    delete this.rooms[room_name];
   }
 
   getAllRooms() {
@@ -76,8 +76,29 @@ class GameServer {
     }));
   }
 
+  getRoomByName(name) {
+    return this.rooms[name];
+  }
+
+  roomIsFull(name) {
+    const room_to_join = this.getRoomByName(name);
+    if (room_to_join && room_to_join.getNbPlayers() >= 5) {
+      return true;
+    }
+    return false;
+  }
+
+  roomIsStarted(name) {
+    const room_to_join = this.getRoomByName(name);
+    if (room_to_join && room_to_join.getState() !== STATE.WAITING) {
+      return true;
+    }
+    return false;
+  }
+
   updateRoomsList() {
     const rooms = this.getAllRooms();
+    console.log('rooms', rooms);
     this.visitors.forEach((visitor) => {
       visitor.emit('updateRoomsList', rooms);
     });

@@ -21,15 +21,26 @@ io.on('connect', (socket) => {
   gameServer.addVisitor(socket);
 
   socket.on('joinOrCreateRoom', (data) => {
+    if (gameServer.roomIsStarted(data.room_name)) {
+      socket.emit('roomError', { message: 'Room is already started or finished' });
+      return;
+    } else if (gameServer.roomIsFull(data.room_name)) {
+      socket.emit('roomError', { message: 'Room is full' });
+      return;
+    }
+
     player = gameServer.createPlayer(data.username, socket);
     room = gameServer.joinOrCreateRoom(data.room_name, player);
 
+    console.log('joinOrCreateRoom', player.id, room.name);
+    socket.emit('roomJoined');
     room.updateInfoRoom();
   });
 
   socket.on('exitRoom', () => {
     if (!room || !player) return;
 
+    console.log('exitRoom', player.id);
     gameServer.playerLeaveRoom(player, room);
     room = null;
     player = null;

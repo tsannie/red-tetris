@@ -1,19 +1,25 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
-import { emitDrop, emitJoinOrCreateRoom, emitMove, emitRotate } from '../redux/socketSlice';
-import { useLocation } from 'react-router';
+import { emitDrop, emitMove, emitRotate } from '../redux/socketSlice';
 import WaitingRoom from '../components/WaitingRoom';
 import TetriminoDisplayBox from '../components/TetriminoDisplayBox';
-import LeaderBoard from '../components/LeaderBoard';
-
-export function meta() {
-  return [{ title: 'Game' }, { name: 'description', content: 'Game page' }];
-}
+import ExitButton from '../components/ExitButton';
+import OpponentsBoard from '../components/OpponentsBoard';
 
 const Game = () => {
   const board = useSelector((state) => state.socket.board);
+  const next = useSelector((state) => state.socket.next);
+  const current = useSelector((state) => state.socket.current);
+  const otherPlayers = useSelector((state) => state.socket.otherPlayers);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log('board', board);
+    console.log('next', next);
+    console.log('current', current);
+    console.log('otherPlayers', otherPlayers);
+  }, [board, next, current, otherPlayers]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -22,7 +28,6 @@ const Game = () => {
           dispatch(emitMove('LEFT'));
           break;
         case 'ArrowRight':
-          console.log('right');
           dispatch(emitMove('RIGHT'));
           break;
         case 'ArrowDown':
@@ -45,47 +50,31 @@ const Game = () => {
     };
   }, []);
 
-  const exemple_date_tetri = [
-    [0, 0, 0, 0],
-    ['c', 'c', 'c', 'c'],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-  ];
-
-  const another_exemple_date_tetri = [
-    ['o', 'o'],
-    ['o', 'o'],
-  ];
-
-  const exemple_data_leaderboard = [
-    { username: 'player1', score: 100 },
-    { username: 'player2', score: 200 },
-    { username: 'player3', score: 300 },
-    { username: 'player4', score: 400 },
-    { username: 'player5', score: 500 },
-    { username: 'player6', score: 600 },
-  ];
-
   if (!board || !board.length) {
     return <WaitingRoom />;
-  } else {
-    return (
-      <div className="grid grid-cols-5 grid-rows-7 gap-0 h-screen max-w-screen-lg m-auto">
-        <div className="col-start-1 col-end-4 row-start-1 row-end-8 flex items-center justify-center">
-          <Board board_value={board} />
-        </div>
-        <div className="col-start-4 col-end-6 row-start-1 row-end-3">
-          <TetriminoDisplayBox tetrimino={exemple_date_tetri} title="Current" />
-        </div>
-        <div className="col-start-4 col-end-6 row-start-3 row-end-5 ">
-          <TetriminoDisplayBox tetrimino={another_exemple_date_tetri} title="Next" />
-        </div>
-        <div className="col-start-4 col-end-6 row-start-5 row-end-8 ">
-          <LeaderBoard players={exemple_data_leaderboard} />
+  }
+
+  return (
+    <React.Fragment>
+      <ExitButton />
+      <div className="w-full h-full flex justify-center">
+        <div className="w-full h-full flex justify-center max-w-[3000px]">
+          <div className="flex flex-rows w-screen h-screen p-4 items-center justify-evenly">
+            <div className="flex items-center justify-center">
+              <Board board_value={board} size="big" />
+            </div>
+            <div className="flex flex-col justify-around items-center overflow-hidden w-md h-full max-h-[1500px]">
+              <div className="grid grid-cols-2 items-center justify-around border-4 border-white w-full p-4 min-h-[25vh]">
+                <TetriminoDisplayBox tetrimino={current} title="Current" />
+                <TetriminoDisplayBox tetrimino={next} title="Next" />
+              </div>
+              <OpponentsBoard otherPlayers={otherPlayers} />
+            </div>
+          </div>
         </div>
       </div>
-    );
-  }
+    </React.Fragment>
+  );
 };
 
 export default Game;

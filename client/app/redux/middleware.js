@@ -1,5 +1,5 @@
 import { setAdminId, setPlayers, setRoomName, setRoomsList, setUserId } from './roomInfoSlice';
-import { connect, updateRoom } from './socketSlice';
+import { connect, reset, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
 const SERVER_URL = 'http://localhost:4000';
@@ -19,6 +19,7 @@ const middleware = (store) => (next) => async (action) => {
         });
 
         socket.on('update', (data) => {
+          console.log('update', data);
           store.dispatch(updateRoom(data));
         });
 
@@ -30,6 +31,14 @@ const middleware = (store) => (next) => async (action) => {
 
         socket.on('updateRoomsList', (data) => {
           store.dispatch(setRoomsList(data));
+        });
+
+        socket.on('roomError', (data) => {
+          console.log('Room ERROR:', data.message);
+          // TODO: Handle error
+          /*  store.dispatch(setRoomJoined(false));
+          store.dispatch(setRoomName(null));
+          store.dispatch(setWaitResponse(false)); */
         });
       }
       break;
@@ -46,6 +55,7 @@ const middleware = (store) => (next) => async (action) => {
       if (socket) {
         socket.emit('exitRoom');
         store.dispatch(setRoomName(null));
+        store.dispatch(reset());
       } else {
         console.error('Socket not connected');
       }
