@@ -98,7 +98,7 @@ class GameServer {
 
   updateRoomsList() {
     const rooms = this.getAllRooms();
-    console.log('rooms', rooms);
+    // console.log('rooms', rooms);
     this.visitors.forEach((visitor) => {
       visitor.emit('updateRoomsList', rooms);
     });
