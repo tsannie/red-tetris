@@ -35,8 +35,16 @@ class Game {
       let newTetri = Tetrimino.clone(this.tetriminos_history[player.n_tetriminos])
       let numberOfBlockBefore = player.board.numberOfTOnGrid(player.board.grid)
       let numberOfBlockAfter = player.board.numberOfTOnGrid(player.board.gridWithCurrentTetrimino(newTetri))
-      if (numberOfBlockAfter !== numberOfBlockBefore + 4) this.gameFinished(player.id)
-        player.tetrimino = newTetri
+      if (numberOfBlockAfter !== numberOfBlockBefore + 4)  {
+          player.socket.emit('update', {
+            board: player.board.grid,
+            otherPlayers: this.retrievePlayerBoard(player),
+            currentTetrimino: undefined,
+            nextTetriminos: this.nextTetriminosWithColor(player),
+          })
+          this.gameFinished(player.id)
+      }
+      player.tetrimino = newTetri
       player.n_tetriminos += 1;
     }
     this.updateTetriminosHistory(player);
