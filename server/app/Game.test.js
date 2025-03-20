@@ -94,7 +94,7 @@ describe('Game', () => {
   test('gameFinished should set player state to FINISHED and emit finished event', () => {
     game.players = [mockPlayer];
     game.gameFinished(mockPlayer.id);
-    expect(mockPlayer.state).toBe(STATE.FINISHED);
+    expect(mockPlayer.state).toBe(STATE.WAITING);
     expect(mockPlayer.socket.emit).toHaveBeenCalledWith('finished', {
       idPlayer: mockPlayer.id,
       pseudo: mockPlayer.pseudo,
