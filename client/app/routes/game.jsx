@@ -28,6 +28,7 @@ const Game = () => {
       dispatch(setRoomError(false));
       navigate('/');
     } else if (roomError) {
+      console.log('roomError', roomError);
       dispatch(emitExitRoom());
       dispatch(setRoomError(false));
       navigate('/rooms');

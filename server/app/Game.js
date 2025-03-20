@@ -42,19 +42,19 @@ class Game {
 
   manageTetriminosPlayers(player) {
     if (player.tetrimino === null) {
-      let newTetri = Tetrimino.clone(this.tetriminos_history[player.n_tetriminos])
-      let numberOfBlockBefore = player.board.numberOfTOnGrid(player.board.grid)
-      let numberOfBlockAfter = player.board.numberOfTOnGrid(player.board.gridWithCurrentTetrimino(newTetri))
-      if (numberOfBlockAfter !== numberOfBlockBefore + 4)  {
-          player.socket.emit('update', {
-            board: player.board.grid,
-            otherPlayers: this.retrievePlayerBoard(player),
-            currentTetrimino: this.tetriminos_history[player.n_tetriminos].getShapeWithColor(),
-            nextTetriminos: this.nextTetriminosWithColor(player),
-          })
-          this.gameFinished(player.id)
+      let newTetri = Tetrimino.clone(this.tetriminos_history[player.n_tetriminos]);
+      let numberOfBlockBefore = player.board.numberOfTOnGrid(player.board.grid);
+      let numberOfBlockAfter = player.board.numberOfTOnGrid(player.board.gridWithCurrentTetrimino(newTetri));
+      if (numberOfBlockAfter !== numberOfBlockBefore + 4) {
+        player.socket.emit('update', {
+          board: player.board.grid,
+          otherPlayers: this.retrievePlayerBoard(player),
+          currentTetrimino: this.tetriminos_history[player.n_tetriminos].getShapeWithColor(),
+          nextTetriminos: this.nextTetriminosWithColor(player),
+        });
+        this.gameFinished(player.id);
       }
-      player.tetrimino = newTetri
+      player.tetrimino = newTetri;
       player.n_tetriminos += 1;
     }
     this.updateTetriminosHistory(player);
@@ -69,6 +69,10 @@ class Game {
         grid: otherPlayer.board.grid,
       }));
     return otherPlayersGame;
+  }
+
+  removePlayer(player) {
+    this.players = this.players.filter((p) => p.id !== player.id);
   }
 
   update() {
@@ -110,16 +114,16 @@ class Game {
       pseudo: player.pseudo,
     });
     if (this.typeOfGame == 'SOLO') {
-      this.lastWinnerId = player.id
+      this.lastWinnerId = player.id;
       player.socket.emit('gameFinished', {
         idPlayer: player.id,
         pseudo: player.pseudo,
       });
-      this.resetAttrib()
+      this.resetAttrib();
     } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) {
       this.players.forEach((playerInGame) => {
         if (playerInGame.state == STATE.STARTED) {
-          this.lastWinnerId = playerInGame.id
+          this.lastWinnerId = playerInGame.id;
           playerInGame.state = STATE.FINISHED;
           playerInGame.socket.emit('finished', {
             idPlayer: playerInGame.id,
@@ -131,7 +135,7 @@ class Game {
         idPlayer: player.id,
         pseudo: player.pseudo,
       });
-      this.resetAttrib()
+      this.resetAttrib();
     }
   }
 

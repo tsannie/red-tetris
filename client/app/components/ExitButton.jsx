@@ -9,6 +9,7 @@ const ExitButton = () => {
 
   const handleExit = () => {
     dispatch(emitExitRoom());
+    dispatch;
     navigate('/rooms');
   };
 

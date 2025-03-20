@@ -45,6 +45,7 @@ class Room {
   }
 
   removePlayer(player) {
+    this.game.removePlayer(player);
     this.players = this.players.filter((p) => p.id !== player.id);
   }
 

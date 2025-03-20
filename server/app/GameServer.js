@@ -32,7 +32,9 @@ class GameServer {
   playerLeaveRoom(player, room) {
     const state_room = room.getState();
     if (state_room === STATE.WAITING || state_room === STATE.STARTED) {
+      console.log('playerLeaveRoom', player.id);
       room.removePlayer(player);
+      this.deletePlayer(player.id);
       if (room.getNbPlayers() === 0) {
         this.removeRoom(room);
       } else {
