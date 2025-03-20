@@ -46,18 +46,6 @@ const Game = () => {
     };
   }, []);
 
-  const exemple_date_tetri = [
-    ['p', 'p', 'p', 'p'],
-    ['p', 'p', 'p', 'p'],
-    ['p', 'p', 'p', 'p'],
-  ];
-
-  const another_exemple_date_tetri = [
-    ['y', 'y', 'y', 'y'],
-    ['y', 'y', 'y', 'y'],
-    ['y', 'y', 'y', 'y'],
-  ];
-
   if (!board || !board.length) {
     return <WaitingRoom />;
   } else {
@@ -75,7 +63,7 @@ const Game = () => {
               <div className="flex flex-col justify-around items-center overflow-hidden w-md h-full max-h-[1500px]">
                 <div className="flex items-center justify-around border-4 border-white w-full p-4">
                   <TetriminoDisplayBox tetrimino={current} title="Current" />
-                  {/* <TetriminoDisplayBox tetrimino={next} title="Next" /> */}
+                  <TetriminoDisplayBox tetrimino={next} title="Next" />
                 </div>
                 <div className="flex flex-col items-center border-4 border-white p-4 ">
                   <h2 className="text-4xl mb-4">Opponents</h2>

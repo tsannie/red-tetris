@@ -33,8 +33,12 @@ const socketSlice = createSlice({
     updateRoom: (state, { payload }) => {
       //console.log('payload', payload);
       state.board = payload.board;
-      state.next = payload.nextTetrimino;
-      state.current = payload.currentTetrimino;
+      // replace 0 in the payload.nextTetriminos[0] by s
+      state.next = payload.nextTetriminos[0] = payload.nextTetriminos[0].map((row) =>
+        row.map((cell) => (cell === 0 ? 's' : cell))
+      );
+      state.current = payload.currentTetrimino.map((row) => row.map((cell) => (cell === 0 ? 's' : cell)));
+
       state.otherPlayers = payload.otherPlayers;
     },
   },
