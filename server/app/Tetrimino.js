@@ -1,4 +1,4 @@
-import { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS } from './const.js';
+import { BOARD_WIDTH, TETRIMINOS } from './const.js';
 
 class Tetrimino {
   constructor(key) {
@@ -26,11 +26,19 @@ class Tetrimino {
   }
 
   getShape() {
-    return this.shape[this.rotation];
+    return JSON.parse(JSON.stringify(this.shape[this.rotation]));
   }
 
   getColor() {
-    return this.color;
+    return (this.color);
+  }
+
+  getShapeWithColor() {
+    let shape = this.getShape()
+    for (let i=0; i<shape.length;i++) {
+      shape[i] = shape[i].map(element => element === 1 ? this.getColor() : element)
+    }
+    return shape
   }
 }
 
