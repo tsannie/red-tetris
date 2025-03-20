@@ -73,7 +73,7 @@ class Player {
       this.board.gridWithCurrentTetrimino(this.tetrimino)
     );
     const number_of_t_after_rotate = this.board.numberOfTOnGrid(
-      this.board.gridWithCurrentTetrimino(tetrimino_to_test, this.grid, true)
+      this.board.gridWithCurrentTetrimino(tetrimino_to_test)
     );
     const canRotate = number_of_t_before_rotate === number_of_t_after_rotate;
     

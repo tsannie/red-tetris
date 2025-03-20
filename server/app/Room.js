@@ -44,11 +44,8 @@ class Room {
     player.socket.emit('update', {
       board: player.gridWithCurrentTetriminoWithShadow(),
       otherPlayers: player.game.retrievePlayerBoard(player),
-      currentTetrimino: player.tetrimino.getShape(),
-      nextTetriminos: player.game.tetriminos_history.slice(
-        player.n_tetriminos,
-        player.n_tetriminos + 2
-      ),
+      currentTetrimino: player.tetrimino.getShapeWithColor(),
+      nextTetriminos: player.game.nextTetriminosWithColor(player),
     });
   }
 
