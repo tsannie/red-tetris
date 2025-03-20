@@ -12,6 +12,16 @@ class Game {
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
     this.gameInterval = 3000;
     this.refreshInterval = 0;
+    this.lastWinnerId = null;
+  }
+
+  resetAttrib() {
+    this.state = STATE.WAITING;
+    clearInterval(this.interval);
+    this.interval = null;
+    this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
+    this.gameInterval = 3000;
+    this.refreshInterval = 0;
   }
 
   getRandomKey() {
@@ -39,7 +49,7 @@ class Game {
           player.socket.emit('update', {
             board: player.board.grid,
             otherPlayers: this.retrievePlayerBoard(player),
-            currentTetrimino: undefined,
+            currentTetrimino: this.tetriminos_history[player.n_tetriminos].getShapeWithColor(),
             nextTetriminos: this.nextTetriminosWithColor(player),
           })
           this.gameFinished(player.id)
@@ -94,31 +104,34 @@ class Game {
 
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
-    // console.log("emit finished")
-    player.state = STATE.FINISHED;
+    player.state = STATE.WAITING;
     player.socket.emit('finished', {
       idPlayer: player.id,
       pseudo: player.pseudo,
     });
     if (this.typeOfGame == 'SOLO') {
-      this.state = STATE.FINISHED;
-      // console.log("emit gameFinished")
-      clearInterval(this.interval);
-      player.socket.emit('gameFinished');
+      this.lastWinnerId = player.id
+      player.socket.emit('gameFinished', {
+        idPlayer: player.id,
+        pseudo: player.pseudo,
+      });
+      this.resetAttrib()
     } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) {
       this.players.forEach((playerInGame) => {
         if (playerInGame.state == STATE.STARTED) {
+          this.lastWinnerId = playerInGame.id
           playerInGame.state = STATE.FINISHED;
-          // console.log("emit finished")
           playerInGame.socket.emit('finished', {
             idPlayer: playerInGame.id,
             pseudo: playerInGame.pseudo,
           });
         }
       });
-      // console.log("emit gameFinished")
-      clearInterval(this.interval);
-      player.socket.emit('gameFinished');
+      player.socket.emit('gameFinished', {
+        idPlayer: player.id,
+        pseudo: player.pseudo,
+      });
+      this.resetAttrib()
     }
   }
 
