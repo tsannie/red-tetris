@@ -1,5 +1,5 @@
 import { setAdminId, setPlayers, setRoomName, setRoomsList, setUserId } from './roomInfoSlice';
-import { connect, updateRoom } from './socketSlice';
+import { connect, reset, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
 const SERVER_URL = 'http://localhost:4000';
@@ -55,7 +55,7 @@ const middleware = (store) => (next) => async (action) => {
       if (socket) {
         socket.emit('exitRoom');
         store.dispatch(setRoomName(null));
-        store.dispatch(updateRoom([]));
+        store.dispatch(reset());
       } else {
         console.error('Socket not connected');
       }
