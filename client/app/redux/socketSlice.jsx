@@ -3,6 +3,7 @@ import { createSlice, createAction } from '@reduxjs/toolkit';
 const initialState = {
   socketConnected: false,
   socket: null,
+  roomError: false,
   board: [],
   next: [],
   current: [],
@@ -45,10 +46,13 @@ const socketSlice = createSlice({
       state.current = [];
       state.otherPlayers = [];
     },
+    setRoomError: (state, { payload }) => {
+      state.roomError = payload;
+    },
   },
 });
 
-export const { connect, disconnect, updateRoom, reset } = socketSlice.actions;
+export const { connect, disconnect, updateRoom, reset, setRoomError } = socketSlice.actions;
 
 export const selectIsConnected = (state) => state.socket.socketConnected;
 

@@ -1,5 +1,5 @@
 import { setAdminId, setPlayers, setRoomName, setRoomsList, setUserId } from './roomInfoSlice';
-import { connect, reset, updateRoom } from './socketSlice';
+import { connect, setRoomError, reset, updateRoom } from './socketSlice';
 import io from 'socket.io-client';
 
 const SERVER_URL = 'http://localhost:4000';
@@ -35,10 +35,7 @@ const middleware = (store) => (next) => async (action) => {
 
         socket.on('roomError', (data) => {
           console.log('Room ERROR:', data.message);
-          // TODO: Handle error
-          /*  store.dispatch(setRoomJoined(false));
-          store.dispatch(setRoomName(null));
-          store.dispatch(setWaitResponse(false)); */
+          store.dispatch(setRoomError(true));
         });
       }
       break;
