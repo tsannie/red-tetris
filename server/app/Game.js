@@ -88,31 +88,29 @@ class Game {
 
   gameFinished(playerId) {
     let player = this.players.find(player => player.id === playerId)
-    console.log("emit finished")
+    // console.log("emit finished")
     player.state = STATE.FINISHED
     player.socket.emit('finished', {
       idPlayer: player.id,
       pseudo: player.pseudo
     })
     if (this.typeOfGame == "SOLO"){
-      console.log("SOLO")
       this.state = STATE.FINISHED
-      console.log("emit gameFinished")
+      // console.log("emit gameFinished")
       clearInterval(this.interval)
       player.socket.emit("gameFinished")
     } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1){
-      console.log("MULTI")
       this.players.forEach((playerInGame) => {
         if (playerInGame.state == STATE.STARTED){
           playerInGame.state = STATE.FINISHED
-          console.log("emit finished")
+          // console.log("emit finished")
           playerInGame.socket.emit('finished', {
             idPlayer: playerInGame.id,
             pseudo: playerInGame.pseudo
           })
         }
       })
-      console.log("emit gameFinished")
+      // console.log("emit gameFinished")
       clearInterval(this.interval)
       player.socket.emit("gameFinished")
     }
@@ -142,7 +140,6 @@ class Game {
   startWithNewInterval(intervalTime) {
     if (intervalTime < 250) return;
     this.gameInterval = intervalTime
-    console.log("changement de rythme", this.gameInterval)
     clearInterval(this.interval)
     this.interval = setInterval(() => {
       this.update();

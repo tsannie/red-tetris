@@ -1,5 +1,4 @@
 import { BOARD_HEIGHT, BOARD_WIDTH } from "./const.js";
-import Tetrimino from "./Tetrimino.js";
 
 class Board {
   constructor() {

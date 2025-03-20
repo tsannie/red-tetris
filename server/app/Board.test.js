@@ -1,261 +1,222 @@
-// Board.test.js
-import Board from './Board.js';
-import Tetrimino from './Tetrimino.js';
-import { BOARD_HEIGHT, BOARD_WIDTH } from './const.js';
+import Board from './Board';
+import { BOARD_HEIGHT, BOARD_WIDTH, TETRIMINOS } from './const';
 
-// Mock des modules dépendants
-jest.mock('./const.js', () => ({
-  BOARD_HEIGHT: 20,
-  BOARD_WIDTH: 10
-}));
+// Mock de la classe Tetrimino
+jest.mock('./Tetrimino', () => {
+  return jest.fn().mockImplementation((type) => ({
+    getShape: jest.fn().mockReturnValue([
+      [0, 1, 0],
+      [1, 1, 1],
+      [0, 0, 0]
+    ]),
+    getColor: jest.fn().mockReturnValue('purple'),
+    position: [5, 5],
+    rotation: 0
+  }));
+});
 
-jest.mock('./Tetrimino.js');
+// Import du mock
+import Tetrimino from './Tetrimino';
 
 describe('Board Class', () => {
   let board;
-  let mockTetrimino;
+  let tetrimino;
 
   beforeEach(() => {
-    // Réinitialisation des mocks
-    jest.clearAllMocks();
-    
-    // Création d'une nouvelle instance de Board pour chaque test
     board = new Board();
-    
-    // Mock pour Tetrimino
-    mockTetrimino = {
-      getShape: jest.fn().mockReturnValue([
-        [0, 1, 0],
-        [1, 1, 1],
-        [0, 0, 0]
-      ]),
-      getColor: jest.fn().mockReturnValue('blue'),
-      position: [5, 5]
-    };
+    tetrimino = new Tetrimino('T');
   });
 
-  describe('constructor', () => {
-    test('should initialize a board with correct dimensions', () => {
-      expect(board.grid.length).toBe(BOARD_HEIGHT);
-      board.grid.forEach(row => {
-        expect(row.length).toBe(BOARD_WIDTH);
-        expect(row.every(cell => cell === 0)).toBe(true);
-      });
+  test('should initialize a grid with correct dimensions', () => {
+    expect(board.grid.length).toBe(BOARD_HEIGHT);
+    expect(board.grid[0].length).toBe(BOARD_WIDTH);
+  });
+
+  test('should initialize an empty grid', () => {
+    for (let y = 0; y < BOARD_HEIGHT; y++) {
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        expect(board.grid[y][x]).toBe(0);
+      }
+    }
+  });
+
+  describe('isOnBoard method', () => {
+    test('should return true when tetrimino is on board', () => {
+      expect(board.isOnBoard(tetrimino)).toBe(true);
+    });
+
+    test('should return false when tetrimino is not on board', () => {
+      // Placer le tetrimino en dehors du plateau
+      tetrimino.position = [-10, -10];
+      expect(board.isOnBoard(tetrimino)).toBe(false);
     });
   });
 
-  describe('gridWithCurrentTetrimino', () => {
-    test('should add tetrimino to the grid correctly', () => {
-      const result = board.gridWithCurrentTetrimino(mockTetrimino);
+  describe('gridWithCurrentTetrimino method', () => {
+    test('should return a grid with the tetrimino placed on it', () => {
+      const gridWithTetrimino = board.gridWithCurrentTetrimino(tetrimino);
       
-      // Vérifions que le tetrimino est bien placé sur la grille
-      // La position est [5, 5], donc le centre du tetrimino est à cette position
-      expect(result[4][5]).toBe('blue'); // En haut du centre (T shape)
-      expect(result[5][4]).toBe('blue'); // À gauche du centre (T shape)
-      expect(result[5][5]).toBe('blue'); // Centre (T shape)
-      expect(result[5][6]).toBe('blue'); // À droite du centre (T shape)
+      // Vérifier que le tetrimino est effectivement placé
+      let tetriminoBlockCount = 0;
+      for (let y = 0; y < BOARD_HEIGHT; y++) {
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+          if (gridWithTetrimino[y][x] === 'purple') {
+            tetriminoBlockCount++;
+          }
+        }
+      }
+      expect(tetriminoBlockCount).toBe(4); // T tetrimino a 4 blocs
     });
 
     test('should not modify the original grid', () => {
-      const originalGrid = board.grid.map(row => [...row]);
-      board.gridWithCurrentTetrimino(mockTetrimino);
-      
-      // Vérifions que la grille originale n'a pas été modifiée
+      const originalGrid = JSON.parse(JSON.stringify(board.grid));
+      board.gridWithCurrentTetrimino(tetrimino);
       expect(board.grid).toEqual(originalGrid);
     });
-
-    test('should respect board boundaries', () => {
-      // Plaçons le tetrimino au bord du plateau
-      mockTetrimino.position = [0, 0];
-      const result = board.gridWithCurrentTetrimino(mockTetrimino);
-      
-      // Certaines parties du tetrimino devraient être en dehors du plateau
-      // et ne devraient pas être ajoutées à la grille
-      const nonZeroCount = result.flat().filter(cell => cell !== 0).length;
-      expect(nonZeroCount).toBeLessThan(4); // Moins de 4 blocs visibles
-    });
   });
 
-  describe('isOnBoard', () => {
-    test('should return true when tetrimino is fully on board', () => {
-      mockTetrimino.position = [5, 5]; // Centre du plateau
-      const result = board.isOnBoard(mockTetrimino);
-      expect(result).toBe(true);
-    });
-
-    test('should return false when tetrimino is partially off board', () => {
-      // En supposant que cette position met le tetrimino partiellement hors du plateau
-      mockTetrimino.position = [-1, 5];
-      
-      // Mock pour la nouvelle instance de Board créée dans isOnBoard
-      Board.mockImplementation(() => ({
-        gridWithCurrentTetrimino: jest.fn().mockReturnValue([
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-          // ... grille avec seulement 3 blocs visibles
-        ]),
-        numberOfTOnGrid: jest.fn().mockReturnValue(3) // Moins de 4 blocs visibles
-      }));
-      
-      const result = board.isOnBoard(mockTetrimino);
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('isTetriminoInsert', () => {
+  describe('isTetriminoInsert method', () => {
     test('should return true when tetrimino can be inserted', () => {
-      // Mock pour simuler l'ajout de 4 blocs
-      const mockGridOriginal = board.grid;
-      const mockGridWithTetrimino = [...mockGridOriginal];
-      
-      // Simulons que numberOfTOnGrid renvoie d'abord le nombre de blocs sur la grille,
-      // puis avec 4 blocs supplémentaires
-      board.numberOfTOnGrid = jest.fn()
-        .mockReturnValueOnce(10) // Nombre initial de blocs
-        .mockReturnValueOnce(14); // Après ajout du tetrimino (4 blocs de plus)
-      
-      board.gridWithCurrentTetrimino = jest.fn().mockReturnValue(mockGridWithTetrimino);
-      
-      const result = board.isTetriminoInsert(mockTetrimino);
-      expect(result).toBe(true);
+      expect(board.isTetriminoInsert(tetrimino)).toBe(true);
     });
 
-    test('should return false when tetrimino cannot be inserted completely', () => {
-      // Mock pour simuler l'ajout de moins de 4 blocs
-      board.numberOfTOnGrid = jest.fn()
-        .mockReturnValueOnce(10) // Nombre initial de blocs
-        .mockReturnValueOnce(13); // Après ajout du tetrimino (3 blocs de plus seulement)
-      
-      const result = board.isTetriminoInsert(mockTetrimino);
-      expect(result).toBe(false);
+    test('should return false when tetrimino cannot be inserted', () => {
+      // Créer un cas où le tetrimino ne peut pas être inséré
+      // Par exemple, en remplissant la grille
+      for (let y = 0; y < BOARD_HEIGHT; y++) {
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+          board.grid[y][x] = 'red';
+        }
+      }
+      expect(board.isTetriminoInsert(tetrimino)).toBe(false);
     });
   });
 
-  describe('keepTetriminoOnBoard', () => {
-    test('should add tetrimino to the board and return 0 penalties when no lines are cleared', () => {
-      // Simulons l'ajout d'un tetrimino sans compléter de ligne
-      board.gridWithCurrentTetrimino = jest.fn().mockReturnValue([
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        // ... et ainsi de suite, aucune ligne complète
+  describe('keepTetriminoOnBoard method', () => {
+    test('should add tetrimino to grid', () => {
+      board.keepTetriminoOnBoard(tetrimino);
+      
+      // Vérifier que le tetrimino est maintenant sur la grille
+      let tetriminoBlockCount = 0;
+      for (let y = 0; y < BOARD_HEIGHT; y++) {
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+          if (board.grid[y][x] === 'purple') {
+            tetriminoBlockCount++;
+          }
+        }
+      }
+      expect(tetriminoBlockCount).toBe(4);
+    });
+
+    test('should return penalties when lines are cleared', () => {
+      // Remplir une ligne presque complète
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        if (x !== 5) {
+          board.grid[10][x] = 'red';
+        }
+      }
+      
+      // Placer le tetrimino pour compléter la ligne
+      tetrimino.position = [5, 10];
+      tetrimino.getShape = jest.fn().mockReturnValue([
+        [0, 0, 0],
+        [0, 1, 0],
+        [0, 0, 0]
       ]);
       
-      const penalties = board.keepTetriminoOnBoard(mockTetrimino);
-      expect(penalties).toBe(0);
-    });
-
-    test('should add tetrimino to the board and return penalties when lines are cleared', () => {
-      // Créons une grille avec une ligne complète
-      const mockGridWithFullLine = Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0));
-      mockGridWithFullLine[10] = Array(BOARD_WIDTH).fill('red'); // Ligne complète
-      
-      board.gridWithCurrentTetrimino = jest.fn().mockReturnValue(mockGridWithFullLine);
-      board.removeLineAndShiftDown = jest.fn(); // Mock pour éviter les effets secondaires
-      
-      const penalties = board.keepTetriminoOnBoard(mockTetrimino);
+      const penalties = board.keepTetriminoOnBoard(tetrimino);
       expect(penalties).toBe(1);
-      expect(board.removeLineAndShiftDown).toHaveBeenCalledWith(10);
     });
   });
 
-  describe('removeLineAndShiftDown', () => {
-    test('should remove a line and shift all lines above it down', () => {
-      // Préparons une grille avec quelques blocs
-      board.grid[5] = Array(BOARD_WIDTH).fill('red');
-      board.grid[4][5] = 'blue';
-      board.grid[3][5] = 'green';
+  describe('removeLineAndShiftDown method', () => {
+    test('should remove a complete line and shift down', () => {
+      // Remplir une ligne
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        board.grid[10][x] = 'red';
+      }
       
-      board.removeLineAndShiftDown(5);
+      // Ajouter quelques blocs au-dessus
+      board.grid[9][5] = 'blue';
+      board.grid[8][5] = 'green';
       
-      // La ligne 5 devrait maintenant être vide
-      expect(board.grid[5].every(cell => cell === 0)).toBe(true);
+      board.removeLineAndShiftDown(10);
       
-      // Les blocs au-dessus devraient avoir été décalés
-      expect(board.grid[5][5]).toBe(0);
-      expect(board.grid[4][5]).toBe('blue');
-      expect(board.grid[3][5]).toBe('green');
+      // Vérifier que la ligne a été supprimée
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        if (x === 5) {
+          expect(board.grid[10][x]).toBe('blue');
+        } else {
+          expect(board.grid[10][x]).toBe(0);
+        }
+      }
+      
+      // Vérifier que les blocs au-dessus ont été décalés
+      expect(board.grid[9][5]).toBe('green');
+      expect(board.grid[8][5]).toBe(0);
     });
   });
 
-  describe('addLineOfTetriminos', () => {
-    test('should add a line at the bottom and shift all lines up', () => {
-      // Ajoutons des blocs pour voir s'ils sont déplacés correctement
-      board.grid[BOARD_HEIGHT - 2][5] = 'blue';
-      board.grid[BOARD_HEIGHT - 3][5] = 'green';
+  describe('addLineOfTetriminos method', () => {
+    test('should add a line of tetriminos at the bottom', () => {
+      // Ajouter quelques blocs
+      board.grid[BOARD_HEIGHT-2][5] = 'blue';
       
       board.addLineOfTetriminos();
       
-      // La dernière ligne devrait être remplie de 't'
-      expect(board.grid[BOARD_HEIGHT - 1].every(cell => cell === 't')).toBe(true);
+      // Vérifier que la ligne du bas est remplie de 't'
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        expect(board.grid[BOARD_HEIGHT-1][x]).toBe('t');
+      }
       
-      // Les blocs devraient avoir été déplacés vers le haut
-      expect(board.grid[BOARD_HEIGHT - 3][5]).toBe('blue');
-      expect(board.grid[BOARD_HEIGHT - 4][5]).toBe('green');
+      // Vérifier que les blocs existants ont été décalés vers le haut
+      expect(board.grid[BOARD_HEIGHT-3][5]).toBe('blue');
     });
   });
 
-  describe('numberOfTOnGrid', () => {
-    test('should count non-zero elements correctly', () => {
-      // Créons une grille avec un nombre connu de blocs
-      const mockGrid = Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0));
-      mockGrid[0][0] = 'red';
-      mockGrid[0][1] = 'blue';
-      mockGrid[1][0] = 'green';
+  describe('numberOfTOnGrid method', () => {
+    test('should return the correct number of non-zero elements', () => {
+      // Grille vide au départ
+      expect(board.numberOfTOnGrid(board.grid)).toBe(0);
       
-      const count = board.numberOfTOnGrid(mockGrid);
-      expect(count).toBe(3);
+      // Ajouter quelques blocs
+      board.grid[5][5] = 'red';
+      board.grid[6][6] = 'blue';
+      board.grid[7][7] = 'green';
+      
+      expect(board.numberOfTOnGrid(board.grid)).toBe(3);
     });
   });
 
-  describe('notFreePos', () => {
-    test('should return positions of occupied cells', () => {
-      // Créons une grille avec quelques cellules occupées
-      const mockGrid = Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0));
-      mockGrid[1][2] = 'red';
-      mockGrid[3][4] = 'blue';
+  describe('notFreePos method', () => {
+    test('should return array of occupied positions', () => {
+      // Grille vide au départ
+      expect(board.notFreePos(board.grid)).toEqual([]);
       
-      const result = board.notFreePos(mockGrid);
-      expect(result).toContain('12'); // Position y=1, x=2
-      expect(result).toContain('34'); // Position y=3, x=4
-      expect(result.length).toBe(2);
+      // Ajouter quelques blocs
+      board.grid[5][5] = 'red';
+      board.grid[6][6] = 'blue';
+      
+      const occupiedPositions = board.notFreePos(board.grid);
+      expect(occupiedPositions).toContain('55');
+      expect(occupiedPositions).toContain('66');
+      expect(occupiedPositions.length).toBe(2);
     });
   });
 
-  describe('isOverwritingTetri', () => {
+  describe('isOverwritingTetri method', () => {
     test('should return true when tetrimino overlaps with existing blocks', () => {
-      // Mettons un bloc sur la grille
+      // Ajouter un bloc à la position où le tetrimino sera placé
       board.grid[5][5] = 'red';
       
-      // Créons un nouveau board pour le mock
-      const mockNewBoard = new Board();
-      mockNewBoard.gridWithCurrentTetrimino = jest.fn().mockReturnValue([
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        // ... la plupart vides
-        [0, 0, 0, 0, 0, 'blue', 0, 0, 0, 0], // Position qui chevauche avec le bloc existant
-      ]);
-      
-      Board.mockImplementation(() => mockNewBoard);
-      
-      board.notFreePos = jest.fn()
-        .mockReturnValueOnce(['55']) // Position occupée sur la grille existante
-        .mockReturnValueOnce(['55']); // Position occupée par le tetrimino
-        
-      const result = board.isOverwritingTetri(mockTetrimino);
-      expect(result).toBe(true);
+      expect(board.isOverwritingTetri(tetrimino)).toBe(true);
     });
 
     test('should return false when tetrimino does not overlap with existing blocks', () => {
-      // Mettons un bloc sur la grille
-      board.grid[1][1] = 'red';
+      // Placer le tetrimino ailleurs
+      tetrimino.position = [2, 2];
       
-      // Le tetrimino est placé ailleurs
-      board.notFreePos = jest.fn()
-        .mockReturnValueOnce(['11']) // Position occupée sur la grille existante
-        .mockReturnValueOnce(['55', '56', '65', '66']); // Positions occupées par le tetrimino
-        
-      const result = board.isOverwritingTetri(mockTetrimino);
-      expect(result).toBe(false);
+      expect(board.isOverwritingTetri(tetrimino)).toBe(false);
     });
   });
 });
