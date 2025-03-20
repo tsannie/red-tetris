@@ -4,6 +4,7 @@ const initialState = {
   socketConnected: false,
   socket: null,
   roomError: false,
+  pseudoError: false,
   board: [],
   next: [],
   current: [],
@@ -49,10 +50,13 @@ const socketSlice = createSlice({
     setRoomError: (state, { payload }) => {
       state.roomError = payload;
     },
+    setPseudoError: (state, { payload }) => {
+      state.pseudoError = payload;
+    },
   },
 });
 
-export const { connect, disconnect, updateRoom, reset, setRoomError } = socketSlice.actions;
+export const { connect, disconnect, updateRoom, reset, setRoomError, setPseudoError } = socketSlice.actions;
 
 export const selectIsConnected = (state) => state.socket.socketConnected;
 

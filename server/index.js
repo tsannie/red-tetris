@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import GameServer from './app/GameServer.js';
-import { direction_vector } from './app/utils.js';
+import { direction_vector, isValidName } from './app/utils.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +26,12 @@ io.on('connect', (socket) => {
       return;
     } else if (gameServer.roomIsFull(data.room_name)) {
       socket.emit('roomError', { message: 'Room is full' });
+      return;
+    } else if (!isValidName(data.username)) {
+      socket.emit('pseudoError', { message: 'Invalid username' });
+      return;
+    } else if (!isValidName(data.room_name)) {
+      socket.emit('roomError', { message: 'Invalid room name' });
       return;
     }
 

@@ -1,12 +1,13 @@
 import React, { use, useEffect } from 'react';
 import Board from '../components/Board';
 import { useDispatch, useSelector } from 'react-redux';
-import { emitDrop, emitExitRoom, emitMove, emitRotate, setRoomError } from '../redux/socketSlice';
+import { emitDrop, emitExitRoom, emitMove, emitRotate, setPseudoError, setRoomError } from '../redux/socketSlice';
 import WaitingRoom from '../components/WaitingRoom';
 import TetriminoDisplayBox from '../components/TetriminoDisplayBox';
 import ExitButton from '../components/ExitButton';
 import OpponentsBoard from '../components/OpponentsBoard';
 import { useNavigate } from 'react-router';
+import { setUsername } from '../redux/roomInfoSlice';
 
 const Game = () => {
   const board = useSelector((state) => state.socket.board);
@@ -15,16 +16,23 @@ const Game = () => {
   const otherPlayers = useSelector((state) => state.socket.otherPlayers);
   const dispatch = useDispatch();
   const roomError = useSelector((state) => state.socket.roomError);
+  const pseudoError = useSelector((state) => state.socket.pseudoError);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (roomError) {
-      console.log('Room ERRORRR:', roomError);
+    if (pseudoError) {
+      console.log('pseudoError', pseudoError);
+      dispatch(emitExitRoom());
+      dispatch(setUsername(null));
+      dispatch(setPseudoError(false));
+      dispatch(setRoomError(false));
+      navigate('/');
+    } else if (roomError) {
       dispatch(emitExitRoom());
       dispatch(setRoomError(false));
       navigate('/rooms');
     }
-  }, [roomError]);
+  }, [roomError, pseudoError]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
