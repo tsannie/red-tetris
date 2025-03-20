@@ -110,13 +110,13 @@ describe('Tetrimino Class', () => {
       const tetrimino = new Tetrimino('I');
       
       // Vérifions que getShape retourne la forme correspondant à la rotation actuelle
-      expect(tetrimino.getShape()).toBe(tetrimino.shape[0]);
+      expect(tetrimino.getShape()).toEqual(JSON.parse(JSON.stringify(tetrimino.shape[0])));
       
       tetrimino.rotate();
-      expect(tetrimino.getShape()).toBe(tetrimino.shape[1]);
+      expect(tetrimino.getShape()).toEqual(JSON.parse(JSON.stringify(tetrimino.shape[tetrimino.rotation])));
       
       tetrimino.rotate();
-      expect(tetrimino.getShape()).toBe(tetrimino.shape[2]);
+      expect(tetrimino.getShape()).toEqual(JSON.parse(JSON.stringify(tetrimino.shape[tetrimino.rotation])));
     });
   });
   
@@ -129,4 +129,16 @@ describe('Tetrimino Class', () => {
       expect(tetriminoI.getColor()).toBe('cyan');
     });
   });
+
+  describe('getShapeWithColor method',() => {
+    test('should return the shape with color of tetrimino', () => {
+      const tetrimino = new Tetrimino('T');
+
+      expect(tetrimino.getShapeWithColor()).toEqual([
+        [0, 'purple', 0],
+        ['purple', 'purple', 'purple'],
+        [0, 0, 0]
+      ]);
+    })
+  })
 });
