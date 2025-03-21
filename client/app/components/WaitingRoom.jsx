@@ -33,7 +33,7 @@ const WaitingRoom = () => {
         {/* Players List */}
         <div className="flex items-center justify-center">
           <ul className="grid grid-cols-1 grid-rows-6 gap-2">
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: 5 }).map((_, index) => (
               <li
                 key={index}
                 className={`flex items-center justify-center rounded-lg w-64 h-16 text-2xl overflow-hidden bg-red-950 ${
