@@ -77,7 +77,7 @@ class Game {
 
   removePlayer(player) {
     this.players = this.players.filter((p) => p.id !== player.id);
-    if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) this.typeOfGame = "SOLO"
+    if (this.players.length == 1) this.typeOfGame = 'SOLO';
   }
 
   update() {
