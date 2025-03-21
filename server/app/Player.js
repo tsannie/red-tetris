@@ -1,5 +1,6 @@
 import { STATE } from './const.js';
 import Tetrimino from './Tetrimino.js';
+import Board from './Board.js';
 import { generateUniqueUserId } from './utils.js';
 
 class Player {
@@ -15,7 +16,7 @@ class Player {
   }
 
   resetAttrib() {
-    this.board = null;
+    this.board = new Board();
     this.n_tetriminos = 0;
     this.tetrimino = null;
     this.game = null;

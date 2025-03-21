@@ -77,6 +77,7 @@ class Game {
 
   removePlayer(player) {
     this.players = this.players.filter((p) => p.id !== player.id);
+    if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) this.typeOfGame = "SOLO"
   }
 
   update() {
@@ -97,7 +98,7 @@ class Game {
       }
     });
     this.refreshInterval += 1;
-    if (this.refreshInterval > 8) {
+    if (this.refreshInterval > 8 && this.state == STATE.STARTED) {
       this.startWithNewInterval(this.gameInterval - 250);
       this.refreshInterval = 0;
     }
