@@ -115,6 +115,7 @@ class Game {
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
     player.state = STATE.WAITING;
+    console.log(player.pseudo)
     this.players.forEach((sender) => {
       sender.socket.emit('finished', {
         idPlayer: player.id,
@@ -122,6 +123,7 @@ class Game {
       });
     });
     if (this.typeOfGame == 'SOLO') {
+      console.log("SOLO END")
       this.lastWinnerId = player.id;
       player.socket.emit('gameFinished', {
         idPlayer: player.id,
@@ -129,6 +131,7 @@ class Game {
       });
       this.resetAttrib();
     } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) {
+      console.log("MULTI END")
       this.players.forEach((playerInGame) => {
         if (playerInGame.state == STATE.STARTED) {
           this.lastWinnerId = playerInGame.id;
@@ -137,11 +140,11 @@ class Game {
             idPlayer: playerInGame.id,
             pseudo: playerInGame.pseudo,
           });
+          player.socket.emit('gameFinished', {
+            idPlayer: playerInGame.id,
+            pseudo: playerInGame.pseudo,
+          });
         }
-      });
-      player.socket.emit('gameFinished', {
-        idPlayer: player.id,
-        pseudo: player.pseudo,
       });
       this.resetAttrib();
     }
