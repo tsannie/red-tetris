@@ -58,7 +58,6 @@ class Player {
     const canMove = number_of_t_before_move === number_of_t_after_move;
     if (!this.board.isTetriminoInsert(this.tetrimino)) {
       if (this.board.isOverwritingTetri(tetrimino_to_test)) {
-        this.game.gameFinished(this.id);
         return false;
       }
       return true;
