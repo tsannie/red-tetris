@@ -24,10 +24,6 @@ const Game = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('user_id' + user_id);
-  }, []);
-
-  useEffect(() => {
     if (pseudoError) {
       console.log('pseudoError', pseudoError);
       dispatch(emitExitRoom());

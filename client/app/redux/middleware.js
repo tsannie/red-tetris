@@ -44,12 +44,11 @@ const middleware = (store) => (next) => async (action) => {
         });
 
         socket.on('gameFinished ', (data) => {
-          //TODO
-          //store.dispatch(reset());
+          console.log('----------------------------gameFinished-----------------------------', data);
+          store.dispatch(reset());
         });
 
         socket.on('finished', (data) => {
-          // add data.idPlayer to the list of dead players
           store.dispatch(setDeadPlayer(data));
         });
       }
