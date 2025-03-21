@@ -111,9 +111,11 @@ class Game {
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
     player.state = STATE.WAITING;
-    this.players.socket.emit('finished', {
-      idPlayer: player.id,
-      pseudo: player.pseudo,
+    this.players.forEach((sender) => {
+      sender.socket.emit('finished', {
+        idPlayer: player.id,
+        pseudo: player.pseudo,
+      });
     });
     if (this.typeOfGame == 'SOLO') {
       this.lastWinnerId = player.id
