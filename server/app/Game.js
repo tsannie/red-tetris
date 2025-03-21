@@ -17,11 +17,17 @@ class Game {
 
   resetAttrib() {
     this.state = STATE.WAITING;
-    clearInterval(this.interval);
     this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
     this.gameInterval = 3000;
+    clearInterval(this.interval);
     this.refreshInterval = 0;
+    this.players.forEach((player) => {
+      player.board = new Board();
+      player.n_tetriminos = 0;
+      player.tetrimino = null;
+      player.state = STATE.WAITING;
+    })
   }
 
   getRandomKey() {
@@ -109,9 +115,11 @@ class Game {
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
     player.state = STATE.WAITING;
-    player.socket.emit('finished', {
-      idPlayer: player.id,
-      pseudo: player.pseudo,
+    this.players.forEach((sender) => {
+      sender.socket.emit('finished', {
+        idPlayer: player.id,
+        pseudo: player.pseudo,
+      });
     });
     if (this.typeOfGame == 'SOLO') {
       this.lastWinnerId = player.id;
