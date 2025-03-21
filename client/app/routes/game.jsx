@@ -9,6 +9,10 @@ import OpponentsBoard from '../components/OpponentsBoard';
 import { useNavigate } from 'react-router';
 import { selectUserId, setUsername } from '../redux/roomInfoSlice';
 
+export function meta() {
+  return [{ title: 'RedTetris' }, { name: 'description', content: 'Game page' }];
+}
+
 const Game = () => {
   const board = useSelector((state) => state.socket.board);
   const next = useSelector((state) => state.socket.next);
