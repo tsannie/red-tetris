@@ -17,10 +17,10 @@ class Game {
 
   resetAttrib() {
     this.state = STATE.WAITING;
-    this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
     this.gameInterval = 3000;
     clearInterval(this.interval);
+    this.interval = null;
     this.refreshInterval = 0;
     this.players.forEach((player) => {
       player.board = new Board();
@@ -116,7 +116,6 @@ class Game {
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
     player.state = STATE.WAITING;
-    console.log(player.pseudo)
     this.players.forEach((sender) => {
       sender.socket.emit('finished', {
         idPlayer: player.id,
@@ -143,8 +142,8 @@ class Game {
           });
           this.players.forEach((sender) => {
             sender.socket.emit('gameFinished', {
-              idPlayer: player.id,
-              pseudo: player.pseudo,
+              idPlayer: playerInGame.id,
+              pseudo: playerInGame.pseudo,
             });
           });
         }
@@ -175,7 +174,7 @@ class Game {
   }
 
   startWithNewInterval(intervalTime) {
-    if (intervalTime < 250) return;
+    if (intervalTime < 500) return;
     this.gameInterval = intervalTime;
     clearInterval(this.interval);
     this.interval = setInterval(() => {
