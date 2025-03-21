@@ -103,9 +103,7 @@ class Player {
 
   drop() {
     const currentTetrimino = this.n_tetriminos
-    while (currentTetrimino == this.n_tetriminos) {
-      this.move([0, 1])
-    }
+    while (currentTetrimino == this.n_tetriminos & this.move([0, 1])) {}
   }
 
   penalities() {

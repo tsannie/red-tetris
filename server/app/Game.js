@@ -141,9 +141,11 @@ class Game {
             idPlayer: playerInGame.id,
             pseudo: playerInGame.pseudo,
           });
-          player.socket.emit('gameFinished', {
-            idPlayer: playerInGame.id,
-            pseudo: playerInGame.pseudo,
+          this.players.forEach((sender) => {
+            sender.socket.emit('gameFinished', {
+              idPlayer: player.id,
+              pseudo: player.pseudo,
+            });
           });
         }
       });

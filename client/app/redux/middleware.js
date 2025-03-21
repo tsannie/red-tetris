@@ -43,7 +43,7 @@ const middleware = (store) => (next) => async (action) => {
           store.dispatch(setPseudoError(true));
         });
 
-        socket.on('gameFinished ', (data) => {
+        socket.on('gameFinished', (data) => {
           console.log('----------------------------gameFinished-----------------------------', data);
           store.dispatch(reset());
         });
