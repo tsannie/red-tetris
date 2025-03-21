@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import React, { use, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAdminId, selectPlayers, selectRoomName, selectUserId } from '../redux/roomInfoSlice';
 import { emitStart } from '../redux/socketSlice';
@@ -9,11 +9,19 @@ const WaitingRoom = () => {
   const user_id = useSelector((state) => selectUserId(state));
   const admin_id = useSelector((state) => selectAdminId(state));
   const roomName = useSelector((state) => selectRoomName(state));
+  const lastWinnerId = useSelector((state) => state.socket.lastWinnerId);
+
   const dispatch = useDispatch();
 
   const handleStartGame = () => {
     dispatch(emitStart());
   };
+
+  useEffect(() => {
+    // console log lastWinnerId and players
+    console.log('lastWinnerId:', lastWinnerId);
+    console.log('players:', players);
+  }, [lastWinnerId, players]);
 
   return (
     <>
@@ -28,7 +36,9 @@ const WaitingRoom = () => {
             {Array.from({ length: 6 }).map((_, index) => (
               <li
                 key={index}
-                className="flex items-center justify-center bg-red-950 rounded-lg w-64 h-16 text-2xl overflow-hidden"
+                className={`flex items-center justify-center rounded-lg w-64 h-16 text-2xl overflow-hidden bg-red-950 ${
+                  players[index]?.id === lastWinnerId ? 'text-yellow-500' : ''
+                }`}
               >
                 {players[index] ? players[index].username : '...'}
               </li>

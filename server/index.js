@@ -41,6 +41,7 @@ io.on('connect', (socket) => {
     console.log('joinOrCreateRoom');
     socket.emit('roomJoined');
     room.updateInfoRoom();
+    console.log('room', room);
   });
 
   socket.on('exitRoom', () => {
