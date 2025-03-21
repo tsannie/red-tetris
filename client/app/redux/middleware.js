@@ -1,5 +1,13 @@
 import { setAdminId, setPlayers, setRoomName, setRoomsList, setUserId } from './roomInfoSlice';
-import { connect, setRoomError, reset, updateRoom, setPseudoError, setDeadPlayer } from './socketSlice';
+import {
+  connect,
+  setRoomError,
+  reset,
+  updateRoom,
+  setPseudoError,
+  setDeadPlayer,
+  setLastWinnerId,
+} from './socketSlice';
 import io from 'socket.io-client';
 
 const SERVER_URL = 'http://localhost:4000';
@@ -27,6 +35,7 @@ const middleware = (store) => (next) => async (action) => {
           store.dispatch(setPlayers(data.players));
           store.dispatch(setAdminId(data.admin_id));
           store.dispatch(setUserId(data.user_id));
+          store.dispatch(setLastWinnerId(data.last_winner_id));
         });
 
         socket.on('updateRoomsList', (data) => {
@@ -44,8 +53,8 @@ const middleware = (store) => (next) => async (action) => {
         });
 
         socket.on('gameFinished', (data) => {
-          console.log('----------------------------gameFinished-----------------------------', data);
           store.dispatch(reset());
+          store.dispatch(setLastWinnerId(data.last_winner_id));
         });
 
         socket.on('finished', (data) => {
@@ -75,6 +84,15 @@ const middleware = (store) => (next) => async (action) => {
     case 'socket/emitGetRooms':
       if (socket) {
         socket.emit('getRoomsList');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
+    case 'socket/emitRoomWaiting':
+      if (socket) {
+        console.log('emitRoomWaiting');
+        socket.emit('roomWaiting');
       } else {
         console.error('Socket not connected');
       }

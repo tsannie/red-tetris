@@ -38,14 +38,12 @@ io.on('connect', (socket) => {
     player = gameServer.createPlayer(data.username, socket);
     room = gameServer.joinOrCreateRoom(data.room_name, player);
 
-    console.log('joinOrCreateRoom');
-    socket.emit('roomJoined');
     room.updateInfoRoom();
   });
 
   socket.on('exitRoom', () => {
     if (!room || !player) return;
-    console.log('exitRoom', player.id);
+
     gameServer.playerLeaveRoom(player, room);
     room = null;
     player = null;
@@ -80,6 +78,12 @@ io.on('connect', (socket) => {
   socket.on('getRoomsList', () => {
     const rooms = gameServer.getAllRooms();
     socket.emit('updateRoomsList', rooms);
+  });
+
+  socket.on('roomWaiting', () => {
+    if (!room || !player || room.admin_id !== player.id) return;
+
+    gameServer.updateRoomsList();
   });
 
   socket.on('disconnect', () => {

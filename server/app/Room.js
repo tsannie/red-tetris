@@ -70,6 +70,7 @@ class Room {
         players,
         admin_id: this.admin_id,
         user_id: player.id,
+        last_winner_id: this.game.lastWinnerId,
       });
     });
   }

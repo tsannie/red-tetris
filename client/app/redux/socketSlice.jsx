@@ -5,6 +5,7 @@ const initialState = {
   socket: null,
   roomError: false,
   pseudoError: false,
+  lastWinnerId: null,
   board: [],
   next: [],
   current: [],
@@ -20,6 +21,7 @@ export const emitDrop = createAction('socket/emitDrop');
 export const emitRotate = createAction('socket/emitRotate');
 export const emitStart = createAction('socket/emitStart');
 export const emitGetRooms = createAction('socket/emitGetRooms');
+export const emitRoomWaiting = createAction('socket/emitRoomWaiting');
 
 const socketSlice = createSlice({
   name: 'socket',
@@ -48,6 +50,7 @@ const socketSlice = createSlice({
       state.current = [];
       state.otherPlayers = [];
       state.deadPlayer = [];
+      state.lastWinnerId = null;
     },
     setRoomError: (state, { payload }) => {
       state.roomError = payload;
@@ -59,10 +62,13 @@ const socketSlice = createSlice({
       const playerId = payload.idPlayer;
       state.deadPlayer.push(playerId);
     },
+    setLastWinnerId: (state, { payload }) => {
+      state.lastWinnerId = payload;
+    },
   },
 });
 
-export const { connect, disconnect, updateRoom, reset, setRoomError, setPseudoError, setDeadPlayer } =
+export const { connect, disconnect, updateRoom, reset, setRoomError, setPseudoError, setDeadPlayer, setLastWinnerId } =
   socketSlice.actions;
 
 export const selectIsConnected = (state) => state.socket.socketConnected;

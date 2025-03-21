@@ -25,8 +25,9 @@ const RoomTable = ({ roomsList, onSelect }) => {
             <td className="border p-2">{room.state.length > 15 ? room.state.slice(0, 12) + '...' : room.state}</td>
             <td className="border p-2">
               <button
-                className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-950"
+                className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-950 disabled:bg-red-400"
                 onClick={() => onSelect(room.room_name)}
+                disabled={room.state !== 'waiting'}
               >
                 Join
               </button>
