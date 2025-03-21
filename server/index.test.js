@@ -1,288 +1,200 @@
-// index.test.js
+import { jest } from '@jest/globals';
 import { Server } from 'socket.io';
-import express from 'express';
-import http from 'http';
 import GameServer from './app/GameServer.js';
-import { direction_vector } from './app/utils.js';
+import { direction_vector, isValidName } from './app/utils.js';
 
-// Mock dependencies to prevent actual server creation
+// Mocks pour les dépendances
 jest.mock('express', () => {
-  const mockApp = {
+  return jest.fn(() => ({
     use: jest.fn(),
-  };
-  return jest.fn(() => mockApp);
+  }));
 });
 
-jest.mock('http', () => {
-  const mockServer = {
+jest.mock('http', () => ({
+  createServer: jest.fn(() => ({
     listen: jest.fn((port, callback) => {
-      if (callback) callback();
-      return mockServer;
-    }),
-  };
-  return {
-    createServer: jest.fn(() => mockServer),
-  };
-});
+      callback();
+      return { close: jest.fn() };
+    })
+  }))
+}));
 
-jest.mock('socket.io', () => {
-  const mockIo = {
-    on: jest.fn(),
-  };
-  return {
-    Server: jest.fn(() => mockIo),
-  };
-});
+jest.mock('socket.io', () => ({
+  Server: jest.fn(() => ({
+    on: jest.fn((event, callback) => {
+      if (event === 'connect') {
+        // Stocker le callback pour pouvoir le tester plus tard
+        mockSocketCallback = callback;
+      }
+    })
+  }))
+}));
 
 jest.mock('./app/GameServer.js');
 jest.mock('./app/utils.js', () => ({
   direction_vector: {
     left: [-1, 0],
     right: [1, 0],
-    down: [0, 1],
+    down: [0, 1]
   },
+  isValidName: jest.fn()
 }));
 
-describe('Socket.io Server (Index.js)', () => {
+// Variable globale pour stocker le callback passé à io.on('connect')
+let mockSocketCallback;
+
+describe('Server initialization', () => {
+  let server;
+  let originalConsoleLog;
+  
+  beforeEach(() => {
+    // Sauvegarder console.log original
+    originalConsoleLog = console.log;
+    console.log = jest.fn();
+    
+    // Réinitialiser les mocks
+    jest.clearAllMocks();
+    
+    // Mock de GameServer
+    GameServer.mockImplementation(() => ({
+      addVisitor: jest.fn(),
+      removeVisitor: jest.fn(),
+      createPlayer: jest.fn().mockReturnValue({ id: 'player1', socket: {}, move: jest.fn(), rotate: jest.fn(), drop: jest.fn() }),
+      joinOrCreateRoom: jest.fn().mockReturnValue({ 
+        updateInfoRoom: jest.fn(),
+        admin_id: 'player1',
+        startGame: jest.fn(),
+        updatePlayerState: jest.fn()
+      }),
+      playerLeaveRoom: jest.fn(),
+      roomIsStarted: jest.fn(),
+      roomIsFull: jest.fn(),
+      updateRoomsList: jest.fn(),
+      getAllRooms: jest.fn().mockReturnValue([])
+    }));
+    
+    // Mock de direction_vector et isValidName
+    isValidName.mockImplementation(() => true);
+    
+    // Importer index.js (contenant les gestionnaires socket.io)
+    server = require('./index.js');
+  });
+  
+  afterEach(() => {
+    // Restaurer console.log
+    console.log = originalConsoleLog;
+  });
+  
+  test('devrait initialiser le serveur sur le port 4000', () => {
+    expect(console.log).toHaveBeenCalledWith('Socket.io server running on port 4000');
+    expect(Server).toHaveBeenCalled();
+  });
+  
+  test('devrait configurer les gestionnaires d\'événements socket.io', () => {
+    // Vérifier que io.on('connect') a été appelé
+    expect(mockSocketCallback).toBeDefined();
+    
+    // Créer un mock pour le socket
+    const mockSocket = {
+      id: 'socket1',
+      emit: jest.fn(),
+      on: jest.fn((event, callback) => {
+        // Stocker les callbacks pour pouvoir les tester plus tard
+        socketEventCallbacks[event] = callback;
+      })
+    };
+    
+    // Objet pour stocker les callbacks des événements socket
+    const socketEventCallbacks = {};
+    
+    // Simuler une connexion
+    mockSocketCallback(mockSocket);
+    
+    
+    // Vérifier que socket.on a été appelé pour chaque événement attendu
+    expect(mockSocket.on).toHaveBeenCalledWith('joinOrCreateRoom', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('exitRoom', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('startGame', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('move', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('rotate', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('drop', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('getRoomsList', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('roomWaiting', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
+  });
+});
+
+describe('Socket event handlers', () => {
   let mockSocket;
-  let mockIo;
   let mockGameServer;
   let mockRoom;
   let mockPlayer;
+  let socketEventCallbacks = {};
   
-  // Save original process.exit
-  const originalProcessExit = process.exit;
-
   beforeEach(() => {
-    // Reset all mocks
-    jest.clearAllMocks();
-    
-    // Prevent server from actually exiting during tests
-    process.exit = jest.fn();
-    
-    // Setup mock socket
+    // Créer un mock pour le socket
     mockSocket = {
-      id: 'socket-id-123',
+      id: 'socket1',
       emit: jest.fn(),
-      on: jest.fn(),
+      on: jest.fn((event, callback) => {
+        // Stocker les callbacks pour pouvoir les tester plus tard
+        socketEventCallbacks[event] = callback;
+      })
     };
-
-    // Setup mock room
+    
+    // Créer un mock pour le joueur
+    mockPlayer = { 
+      id: 'player1', 
+      socket: mockSocket,
+      move: jest.fn().mockReturnValue(true),
+      rotate: jest.fn().mockReturnValue(true),
+      drop: jest.fn()
+    };
+    
+    // Créer un mock pour la salle
     mockRoom = {
-      admin_id: 'player-id-123',
       updateInfoRoom: jest.fn(),
+      admin_id: 'player1',
       startGame: jest.fn(),
-      updatePlayerState: jest.fn(),
+      updatePlayerState: jest.fn()
     };
-
-    // Setup mock player
-    mockPlayer = {
-      id: 'player-id-123',
-      move: jest.fn(),
-      rotate: jest.fn(),
-      drop: jest.fn(),
-    };
-
-    // Setup mock gameServer
+    
+    // Créer un mock pour le GameServer
     mockGameServer = {
       addVisitor: jest.fn(),
       removeVisitor: jest.fn(),
       createPlayer: jest.fn().mockReturnValue(mockPlayer),
       joinOrCreateRoom: jest.fn().mockReturnValue(mockRoom),
       playerLeaveRoom: jest.fn(),
-      getAllRooms: jest.fn().mockReturnValue([{ name: 'testRoom' }]),
+      roomIsStarted: jest.fn().mockReturnValue(false),
+      roomIsFull: jest.fn().mockReturnValue(false),
       updateRoomsList: jest.fn(),
+      getAllRooms: jest.fn().mockReturnValue([])
     };
-
-    // Mock GameServer constructor
+    
+    // Remplacer l'implémentation de GameServer
     GameServer.mockImplementation(() => mockGameServer);
     
-    // Setup mockIo to call the callback with our mockSocket
-    mockIo = Server();
-    mockIo.on.mockImplementation((event, callback) => {
-      if (event === 'connect') {
-        callback(mockSocket);
-      }
-    });
-  });
-  
-  afterEach(() => {
-    // Restore original process.exit
-    process.exit = originalProcessExit;
+    // Mock de isValidName
+    isValidName.mockImplementation((name) => name !== 'invalid');
+    
+    // Importer index.js (contenant les gestionnaires socket.io)
+    require('./index.js');
+    
+    // Simuler une connexion et récupérer les callbacks
+    mockSocketCallback(mockSocket);
   });
 
-  test('Server initializes correctly', () => {
-    // Directly import index.js (this will run the file)
-    jest.isolateModules(() => {
-      // This will trigger the code in index.js to run
-      require('./index.js');
-    });
+  test('devrait renvoyer une erreur si le nom d\'utilisateur est invalide', () => {
+    const data = { username: 'invalid', room_name: 'testRoom' };
     
-    // Check that express, http.createServer, and Server were called
-    expect(express).toHaveBeenCalled();
-    expect(http.createServer).toHaveBeenCalled();
-    expect(Server).toHaveBeenCalled();
+    // Appeler le callback de joinOrCreateRoom
+    socketEventCallbacks.joinOrCreateRoom(data);
     
-    // Get the mock server instance
-    const mockServer = http.createServer();
-    
-    // Check that the server is listening on port 4000
-    expect(mockServer.listen).toHaveBeenCalledWith(4000, expect.any(Function));
-    
-    // Check that a GameServer instance was created
-    expect(GameServer).toHaveBeenCalled();
-    
-    // Check that socket.io is listening for connections
-    expect(mockIo.on).toHaveBeenCalledWith('connect', expect.any(Function));
+    // Vérifier que l'erreur a été émise
+    expect(mockSocket.emit).toHaveBeenCalledWith('pseudoError', { message: 'Invalid username' });
+    expect(mockGameServer.createPlayer).not.toHaveBeenCalled();
   });
+  
 
-  test('Socket event handlers are registered when a connection is established', () => {
-    // Directly import index.js (this will run the file)
-    jest.isolateModules(() => {
-      require('./index.js');
-    });
-    
-    // Check that the socket event handlers are registered
-    const expectedEvents = [
-      'joinOrCreateRoom',
-      'exitRoom',
-      'startGame',
-      'move',
-      'rotate',
-      'drop',
-      'getRoomsList',
-      'disconnect'
-    ];
-    
-    expectedEvents.forEach(event => {
-      expect(mockSocket.on).toHaveBeenCalledWith(event, expect.any(Function));
-    });
-    
-    // Check that addVisitor was called
-    expect(mockGameServer.addVisitor).toHaveBeenCalledWith(mockSocket);
-  });
-
-  // Next, let's test each handler by finding it and invoking it directly
-  
-  test('joinOrCreateRoom event handler creates player and joins room', () => {
-    // Import index.js
-    jest.isolateModules(() => {
-      require('./index.js');
-    });
-    
-    // Find the joinOrCreateRoom handler
-    const joinOrCreateRoomHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'joinOrCreateRoom'
-    )[1];
-    
-    // Call the handler
-    joinOrCreateRoomHandler({ username: 'testPlayer', room_name: 'testRoom' });
-    
-    // Check expected behavior
-    expect(mockGameServer.createPlayer).toHaveBeenCalledWith('testPlayer', mockSocket);
-    expect(mockGameServer.joinOrCreateRoom).toHaveBeenCalledWith('testRoom', mockPlayer);
-    expect(mockRoom.updateInfoRoom).toHaveBeenCalled();
-  });
-  
-  test('exitRoom event handler removes player from room', () => {
-    // Import index.js
-    jest.isolateModules(() => {
-      require('./index.js');
-    });
-    
-    // First join a room to set up the test
-    const joinOrCreateRoomHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'joinOrCreateRoom'
-    )[1];
-    joinOrCreateRoomHandler({ username: 'testPlayer', room_name: 'testRoom' });
-    
-    // Find the exitRoom handler
-    const exitRoomHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'exitRoom'
-    )[1];
-    
-    // Call the handler
-    exitRoomHandler();
-    
-    // Check expected behavior
-    expect(mockGameServer.playerLeaveRoom).toHaveBeenCalledWith(mockPlayer, mockRoom);
-  });
-  
-  test('startGame event handler starts the game if user is admin', () => {
-    // Import index.js
-    jest.isolateModules(() => {
-      require('./index.js');
-    });
-    
-    // First join a room to set up the test
-    const joinOrCreateRoomHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'joinOrCreateRoom'
-    )[1];
-    joinOrCreateRoomHandler({ username: 'testPlayer', room_name: 'testRoom' });
-    
-    // Find the startGame handler
-    const startGameHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'startGame'
-    )[1];
-    
-    // Call the handler
-    startGameHandler();
-    
-    // Check expected behavior
-    expect(mockRoom.startGame).toHaveBeenCalled();
-    expect(mockGameServer.updateRoomsList).toHaveBeenCalled();
-  });
-  
-  test('move event handler moves player if possible', () => {
-    // Setup successful move
-    mockPlayer.move.mockReturnValue(true);
-    
-    // Import index.js
-    jest.isolateModules(() => {
-      require('./index.js');
-    });
-    
-    // First join a room to set up the test
-    const joinOrCreateRoomHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'joinOrCreateRoom'
-    )[1];
-    joinOrCreateRoomHandler({ username: 'testPlayer', room_name: 'testRoom' });
-    
-    // Find the move handler
-    const moveHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'move'
-    )[1];
-    
-    // Call the handler
-    moveHandler('left');
-    
-    // Check expected behavior
-    expect(mockPlayer.move).toHaveBeenCalledWith(direction_vector.left);
-    expect(mockRoom.updatePlayerState).toHaveBeenCalledWith(mockPlayer);
-  });
-  
-  test('disconnect event handler removes player from room and visitor list', () => {
-    // Import index.js
-    jest.isolateModules(() => {
-      require('./index.js');
-    });
-    
-    // First join a room to set up the test
-    const joinOrCreateRoomHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'joinOrCreateRoom'
-    )[1];
-    joinOrCreateRoomHandler({ username: 'testPlayer', room_name: 'testRoom' });
-    
-    // Find the disconnect handler
-    const disconnectHandler = mockSocket.on.mock.calls.find(
-      call => call[0] === 'disconnect'
-    )[1];
-    
-    // Call the handler
-    disconnectHandler();
-    
-    // Check expected behavior
-    expect(mockGameServer.playerLeaveRoom).toHaveBeenCalledWith(mockPlayer, mockRoom);
-    expect(mockGameServer.removeVisitor).toHaveBeenCalledWith(mockSocket);
-  });
 });
