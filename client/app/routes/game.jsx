@@ -7,17 +7,25 @@ import TetriminoDisplayBox from '../components/TetriminoDisplayBox';
 import ExitButton from '../components/ExitButton';
 import OpponentsBoard from '../components/OpponentsBoard';
 import { useNavigate } from 'react-router';
-import { setUsername } from '../redux/roomInfoSlice';
+import { selectUserId, setUsername } from '../redux/roomInfoSlice';
 
 const Game = () => {
   const board = useSelector((state) => state.socket.board);
   const next = useSelector((state) => state.socket.next);
   const current = useSelector((state) => state.socket.current);
+  const user_id = useSelector((state) => selectUserId(state));
+
   const otherPlayers = useSelector((state) => state.socket.otherPlayers);
   const dispatch = useDispatch();
   const roomError = useSelector((state) => state.socket.roomError);
   const pseudoError = useSelector((state) => state.socket.pseudoError);
+  const deadPlayer = useSelector((state) => state.socket.deadPlayer);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('user_id' + user_id);
+  }, []);
 
   useEffect(() => {
     if (pseudoError) {
@@ -75,14 +83,14 @@ const Game = () => {
         <div className="w-full h-full flex justify-center max-w-[3000px]">
           <div className="flex flex-rows w-screen h-screen p-4 items-center justify-evenly">
             <div className="flex items-center justify-center">
-              <Board board_value={board} size="big" />
+              <Board board_value={board} size="big" isDarkened={deadPlayer.includes(user_id)} />
             </div>
             <div className="flex flex-col justify-around items-center overflow-hidden w-md h-full max-h-[1500px]">
               <div className="grid grid-cols-2 items-center justify-around border-4 border-white w-full p-4 min-h-[25vh]">
                 <TetriminoDisplayBox tetrimino={current} title="Current" />
                 <TetriminoDisplayBox tetrimino={next} title="Next" />
               </div>
-              <OpponentsBoard otherPlayers={otherPlayers} />
+              <OpponentsBoard otherPlayers={otherPlayers} deadPlayer={deadPlayer} />
             </div>
           </div>
         </div>

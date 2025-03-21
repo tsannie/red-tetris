@@ -2,9 +2,7 @@ import React, { useEffect } from 'react';
 import Board from './Board';
 import { useSelector } from 'react-redux';
 
-const OpponentsBoard = ({ otherPlayers }) => {
-  const deadPlayer = useSelector((state) => state.socket.deadPlayer);
-
+const OpponentsBoard = ({ otherPlayers, deadPlayer }) => {
   useEffect(() => {
     console.log('deadPlayer', deadPlayer);
   }, [deadPlayer]);
