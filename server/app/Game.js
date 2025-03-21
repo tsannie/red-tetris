@@ -112,6 +112,7 @@ class Game {
 
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
+
     player.state = STATE.FINISHED;
     console.log(player.pseudo);
     this.players.forEach((sender) => {
@@ -154,7 +155,7 @@ class Game {
   }
 
   startWithNewInterval(intervalTime) {
-    if (intervalTime < 250) return;
+    if (intervalTime < 500) return;
     this.gameInterval = intervalTime;
     clearInterval(this.interval);
     this.interval = setInterval(() => {
