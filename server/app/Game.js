@@ -17,16 +17,13 @@ class Game {
 
   resetAttrib() {
     this.state = STATE.WAITING;
+    clearInterval(this.interval);
     this.interval = null;
     this.tetriminos_history = []; // doit toujours etre superieur aux max de player.n_tetriminos
     this.gameInterval = 3000;
-    clearInterval(this.interval);
     this.refreshInterval = 0;
     this.players.forEach((player) => {
-      player.board = new Board();
-      player.n_tetriminos = 0;
-      player.tetrimino = null;
-      player.state = STATE.WAITING;
+      player.resetAttrib();
     });
   }
 
@@ -115,7 +112,7 @@ class Game {
 
   gameFinished(playerId) {
     let player = this.players.find((player) => player.id === playerId);
-    player.state = STATE.WAITING;
+    player.state = STATE.FINISHED;
     console.log(player.pseudo);
     this.players.forEach((sender) => {
       sender.socket.emit('finished', {
@@ -123,31 +120,13 @@ class Game {
         pseudo: player.pseudo,
       });
     });
-    if (this.typeOfGame == 'SOLO') {
-      console.log('SOLO END');
-      this.lastWinnerId = player.id;
-      player.socket.emit('gameFinished', {
-        idPlayer: player.id,
-        pseudo: player.pseudo,
-      });
-      this.resetAttrib();
-    } else if (this.players.filter((element) => element.state == STATE.STARTED).length == 1) {
-      console.log('MULTI END');
-      this.players.forEach((playerInGame) => {
-        if (playerInGame.state == STATE.STARTED) {
-          this.lastWinnerId = playerInGame.id;
-          playerInGame.state = STATE.FINISHED;
-          playerInGame.socket.emit('finished', {
-            idPlayer: playerInGame.id,
-            pseudo: playerInGame.pseudo,
-          });
-          this.players.forEach((sender) => {
-            sender.socket.emit('gameFinished', {
-              idPlayer: player.id,
-              pseudo: player.pseudo,
-            });
-          });
-        }
+    if (this.players.filter((element) => element.state == STATE.STARTED).length == 1 || this.typeOfGame == 'SOLO') {
+      let winner = this.typeOfGame == 'SOLO' ? player : this.players.find((element) => element.state === STATE.STARTED);
+      this.lastWinnerId = winner.id;
+      this.players.forEach((sender) => {
+        sender.socket.emit('gameFinished', {
+          last_winner_id: winner.id,
+        });
       });
       this.resetAttrib();
     }

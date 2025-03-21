@@ -21,6 +21,7 @@ export const emitDrop = createAction('socket/emitDrop');
 export const emitRotate = createAction('socket/emitRotate');
 export const emitStart = createAction('socket/emitStart');
 export const emitGetRooms = createAction('socket/emitGetRooms');
+export const emitRoomWaiting = createAction('socket/emitRoomWaiting');
 
 const socketSlice = createSlice({
   name: 'socket',

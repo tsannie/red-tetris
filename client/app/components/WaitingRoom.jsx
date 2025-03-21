@@ -1,7 +1,7 @@
-import React, { use, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAdminId, selectPlayers, selectRoomName, selectUserId } from '../redux/roomInfoSlice';
-import { emitStart } from '../redux/socketSlice';
+import { emitRoomWaiting, emitStart } from '../redux/socketSlice';
 import ExitButton from './ExitButton';
 
 const WaitingRoom = () => {
@@ -18,10 +18,10 @@ const WaitingRoom = () => {
   };
 
   useEffect(() => {
-    // console log lastWinnerId and players
-    console.log('lastWinnerId:', lastWinnerId);
-    console.log('players:', players);
-  }, [lastWinnerId, players]);
+    if (lastWinnerId && user_id === admin_id) {
+      dispatch(emitRoomWaiting());
+    }
+  }, [lastWinnerId]);
 
   return (
     <>

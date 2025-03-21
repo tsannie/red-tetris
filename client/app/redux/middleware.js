@@ -54,6 +54,7 @@ const middleware = (store) => (next) => async (action) => {
 
         socket.on('gameFinished', (data) => {
           store.dispatch(reset());
+          store.dispatch(setLastWinnerId(data.last_winner_id));
         });
 
         socket.on('finished', (data) => {
@@ -83,6 +84,15 @@ const middleware = (store) => (next) => async (action) => {
     case 'socket/emitGetRooms':
       if (socket) {
         socket.emit('getRoomsList');
+      } else {
+        console.error('Socket not connected');
+      }
+      break;
+
+    case 'socket/emitRoomWaiting':
+      if (socket) {
+        console.log('emitRoomWaiting');
+        socket.emit('roomWaiting');
       } else {
         console.error('Socket not connected');
       }
