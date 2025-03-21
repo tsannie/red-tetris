@@ -14,6 +14,7 @@ class Board {
 
 
   gridWithCurrentTetrimino(tetrimino, grid, dev) {
+    if (!tetrimino) return
     if (grid === undefined) grid = this.grid
     grid = grid.map((row) => row.slice());
     const shape = tetrimino.getShape();
