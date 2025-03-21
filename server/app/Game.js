@@ -115,7 +115,6 @@ class Game {
     let player = this.players.find((player) => player.id === playerId);
 
     player.state = STATE.FINISHED;
-    console.log(player.pseudo);
     this.players.forEach((sender) => {
       sender.socket.emit('finished', {
         idPlayer: player.id,
