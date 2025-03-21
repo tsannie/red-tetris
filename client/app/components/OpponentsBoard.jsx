@@ -3,9 +3,7 @@ import Board from './Board';
 import { useSelector } from 'react-redux';
 
 const OpponentsBoard = ({ otherPlayers, deadPlayer }) => {
-  useEffect(() => {
-    console.log('deadPlayer', deadPlayer);
-  }, [deadPlayer]);
+  const lastWinnerId = useSelector((state) => state.socket.lastWinnerId);
 
   if (!otherPlayers || otherPlayers.length === 0) {
     return (
@@ -23,7 +21,7 @@ const OpponentsBoard = ({ otherPlayers, deadPlayer }) => {
         {otherPlayers.map((player, index) => (
           <div key={index} className="flex items-center justify-center flex-col">
             <Board board_value={player.grid} size="small" isDarkened={deadPlayer.includes(player.id)} />
-            <h3 className="text-xl mt-2">{player.pseudo}</h3>
+            <h3 className={`text-xl mt-2 ${player.id === lastWinnerId ? 'text-yellow-500' : ''}`}>{player.pseudo}</h3>
           </div>
         ))}
       </div>
