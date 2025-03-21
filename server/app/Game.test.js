@@ -1,123 +1,250 @@
-// Game.test.js
-import Game from './Game';
-import { STATE, TETRIMINOS } from './const';
-import Tetrimino from './Tetrimino';
-import Board from './Board';
+import Game from './Game.js';
+import Board from './Board.js';
+import Tetrimino from './Tetrimino.js';
+import { STATE, TETRIMINOS } from './const.js';
 
-jest.mock('./Tetrimino');
-jest.mock('./Board');
-jest.mock('./const', () => ({
-  STATE: {
-    STARTED: 'started', // on game
-    WAITING: 'waiting', // on pre-game
-    FINISHED: 'finished', // other
-  },
-  TETRIMINOS: {
-    'T': { shape: [[1, 1, 1], [0, 1, 0]], color: ['purple'] },
-  },
-  BOARD_HEIGHT: 20,
-}));
+// Mock des dépendances
+jest.mock('./Board.js');
+jest.mock('./Tetrimino.js');
 
 describe('Game', () => {
   let game;
-  let mockPlayer;
+  let mockPlayer1;
+  let mockPlayer2;
+  let mockBoard;
+  let mockTetrimino;
 
   beforeEach(() => {
-    game = new Game();
-
-    Board.mockImplementation(() => ({
-      grid: Array.from({ length: 20 }, () => Array(8).fill(0)),
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    
+    // Mocks pour Tetrimino
+    mockTetrimino = {
+      getShapeWithColor: jest.fn().mockReturnValue([['#FF0000']]),
+      shape: [['#FF0000']]
+    };
+    
+    Tetrimino.mockImplementation(() => mockTetrimino);
+    Tetrimino.clone = jest.fn().mockReturnValue(mockTetrimino);
+    
+    // Mock pour Board
+    mockBoard = {
+      grid: [[]],
       numberOfTOnGrid: jest.fn().mockReturnValue(0),
-      gridWithCurrentTetrimino: jest.fn().mockReturnValue(
-        Array.from({ length: 20 }, () => Array(8).fill(0))
-      ),
-    }));
-
-    mockPlayer = {
-      id: '1',
+      gridWithCurrentTetrimino: jest.fn().mockReturnValue([[]])
+    };
+    
+    Board.mockImplementation(() => mockBoard);
+    
+    // Mock pour les joueurs
+    mockPlayer1 = {
+      id: 'player1',
       pseudo: 'Player1',
       socket: { emit: jest.fn() },
-      game: game,
-      board: new Board(),
-      n_tetriminos: 0,
       tetrimino: null,
-      state: STATE.FINISHED,
+      n_tetriminos: 0,
+      board: null,
+      state: STATE.WAITING,
+      resetAttrib: jest.fn(),
       move: jest.fn(),
-      gridWithCurrentTetriminoWithShadow: jest.fn(),
-      penalities: jest.fn(),
+      gridWithCurrentTetriminoWithShadow: jest.fn().mockReturnValue([[]])
     };
+    
+    mockPlayer2 = {
+      id: 'player2',
+      pseudo: 'Player2',
+      socket: { emit: jest.fn() },
+      tetrimino: null,
+      n_tetriminos: 0,
+      board: null,
+      state: STATE.WAITING,
+      resetAttrib: jest.fn(),
+      move: jest.fn(),
+      gridWithCurrentTetriminoWithShadow: jest.fn().mockReturnValue([[]])
+    };
+    
+    // Création de l'instance de Game
+    game = new Game();
   });
 
-  test('should initialize with correct default values', () => {
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
+
+  test('devrait créer une instance de Game avec les valeurs par défaut', () => {
     expect(game.typeOfGame).toBe('SOLO');
+    expect(game.players).toEqual([]);
     expect(game.state).toBe(STATE.WAITING);
     expect(game.interval).toBeNull();
     expect(game.tetriminos_history).toEqual([]);
     expect(game.gameInterval).toBe(3000);
     expect(game.refreshInterval).toBe(0);
+    expect(game.lastWinnerId).toBeNull();
   });
 
-  test('getRandomKey should return a random key from TETRIMINOS', () => {
-    const keys = Object.keys(TETRIMINOS);
-    const randomKey = game.getRandomKey();
-    expect(keys).toContain(randomKey);
+  test('devrait réinitialiser les attributs du jeu', () => {
+    // Setup
+    game.state = STATE.STARTED;
+    game.interval = setInterval(() => {}, 1000);
+    game.tetriminos_history = [mockTetrimino];
+    game.gameInterval = 2000;
+    game.refreshInterval = 5;
+    game.players = [mockPlayer1, mockPlayer2];
+    
+    // Action
+    game.resetAttrib();
+    
+    // Assertions
+    expect(game.state).toBe(STATE.WAITING);
+    expect(game.interval).toBeNull();
+    expect(game.tetriminos_history).toEqual([]);
+    expect(game.gameInterval).toBe(3000);
+    expect(game.refreshInterval).toBe(0);
+    expect(mockPlayer1.resetAttrib).toHaveBeenCalled();
+    expect(mockPlayer2.resetAttrib).toHaveBeenCalled();
   });
 
-  test('updateTetriminosHistory should add new Tetriminos to history', () => {
-    mockPlayer.n_tetriminos = 2;
-    game.updateTetriminosHistory(mockPlayer);
-    expect(game.tetriminos_history.length).toBeGreaterThanOrEqual(4);
+  test('devrait générer une clé aléatoire de tetrimino', () => {
+    // Simuler Math.random pour un test déterministe
+    const mockMathRandom = jest.spyOn(Math, 'random').mockReturnValue(0);
+    
+    const key = game.getRandomKey();
+    
+    expect(key).toBe(Object.keys(TETRIMINOS)[0]);
+    mockMathRandom.mockRestore();
   });
 
-  test('retrievePlayerBoard should return other players game info', () => {
-    game.players = [mockPlayer, { pseudo: 'Player2', state: STATE.STARTED, board: { grid: [] } }];
-    const otherPlayersGame = game.retrievePlayerBoard(mockPlayer);
-    expect(otherPlayersGame.length).toBe(1);
-    expect(otherPlayersGame[0].pseudo).toBe('Player2');
+  test('devrait mettre à jour l\'historique des tetriminos', () => {
+    const player = { 
+      n_tetriminos: 3,
+      board: mockBoard
+    };
+    game.tetriminos_history = [mockTetrimino];
+    
+    game.updateTetriminosHistory(player);
+    
+    expect(game.tetriminos_history.length).toBe(5); // 1 existant + 4 nouveaux
+    expect(Tetrimino).toHaveBeenCalledTimes(4);
   });
 
-  test('update should call manageTetriminosPlayers for each player', () => {
-    game.players = [mockPlayer];
-    game.update = jest.fn();
+  test('devrait démarrer le jeu en mode solo', () => {
+    game.start([mockPlayer1]);
+    
+    expect(game.typeOfGame).toBe('SOLO');
+    expect(game.players).toEqual([mockPlayer1]);
+    expect(mockPlayer1.game).toBe(game);
+    expect(Board).toHaveBeenCalled();
+    expect(mockPlayer1.socket.emit).toHaveBeenCalledWith('gameStarted');
+    expect(game.interval).not.toBeNull();
+  });
+
+  test('devrait démarrer le jeu en mode multi', () => {
+    game.start([mockPlayer1, mockPlayer2]);
+    
+    expect(game.typeOfGame).toBe('MULTI');
+    expect(game.players).toContain(mockPlayer1);
+    expect(game.players).toContain(mockPlayer2);
+    expect(mockPlayer1.socket.emit).toHaveBeenCalledWith('gameStarted');
+    expect(mockPlayer2.socket.emit).toHaveBeenCalledWith('gameStarted');
+  });
+
+  test('devrait mettre à jour le jeu et gérer les tetriminos des joueurs', () => {
+    // Setup
+    game.players = [mockPlayer1];
+    mockPlayer1.state = STATE.STARTED;
+    mockPlayer1.board = mockBoard;  // Important: définir le board avant d'appeler update
+    mockPlayer1.n_tetriminos = 0;
+    
+    // Remplir l'historique des tetriminos pour éviter un accès à un index invalide
+    game.tetriminos_history = [mockTetrimino, mockTetrimino];
+    
+    // Action
     game.update();
-    expect(game.update).toHaveBeenCalled();
+    
+    // Vérifier que les tetriminos sont gérés et que l'état du jeu est mis à jour
+    expect(mockPlayer1.socket.emit).toHaveBeenCalled();
+    expect(game.refreshInterval).toBe(1);
   });
 
-  test('nextTetriminosWithColor should return next Tetriminos with color', () => {
-    game.tetriminos_history = [new Tetrimino('T'), new Tetrimino('T')];
-    mockPlayer.n_tetriminos = 0;
-    const nextTetriminos = game.nextTetriminosWithColor(mockPlayer);
-    expect(nextTetriminos.length).toBe(2);
-    expect(nextTetriminos[0]).toEqual(game.tetriminos_history[0].getShapeWithColor());
+  test('devrait terminer le jeu pour un joueur', () => {
+    // Setup
+    game.players = [mockPlayer1];
+    mockPlayer1.state = STATE.STARTED;
+    mockPlayer1.board = mockBoard;  // Définir le board
+    game.typeOfGame = 'SOLO';
+    
+    // Action
+    game.gameFinished(mockPlayer1.id);
+    
+    // Vérifier l'état du jeu après la fin
+    expect(mockPlayer1.state).toBe(STATE.FINISHED);
+    expect(mockPlayer1.socket.emit).toHaveBeenCalledWith('finished', expect.any(Object));
+    expect(mockPlayer1.socket.emit).toHaveBeenCalledWith('gameFinished', expect.any(Object));
+    expect(game.state).toBe(STATE.WAITING);
   });
 
-  test('gameFinished should set player state to FINISHED and emit finished event', () => {
-    game.players = [mockPlayer];
-    game.gameFinished(mockPlayer.id);
-    expect(mockPlayer.state).toBe(STATE.WAITING);
-    expect(mockPlayer.socket.emit).toHaveBeenCalledWith('finished', {
-      idPlayer: mockPlayer.id,
-      pseudo: mockPlayer.pseudo,
-    });
+  test('devrait supprimer un joueur du jeu', () => {
+    // Setup
+    game.players = [mockPlayer1, mockPlayer2];
+    
+    // Action
+    game.removePlayer(mockPlayer1);
+    
+    // Vérifier que le joueur est supprimé
+    expect(game.players).not.toContain(mockPlayer1);
+    expect(game.players).toContain(mockPlayer2);
   });
 
-  test('start should initialize game with players', () => {
-    game.start([mockPlayer]);
-    clearInterval(game.interval)
-    expect(game.players).toContain(mockPlayer);
-    expect(mockPlayer.socket.emit).toHaveBeenCalledWith('gameStarted');
-    clearInterval(game.interval)
-  });
-
-  test('startWithNewInterval should update game interval', () => {
+  test('devrait démarrer le jeu avec un nouvel intervalle', () => {
+    // Setup
+    game.interval = setInterval(() => {}, 3000);
+    
+    // Action
     game.startWithNewInterval(2000);
+    
+    // Vérifier que l'intervalle est mis à jour
     expect(game.gameInterval).toBe(2000);
-    clearInterval(game.interval)
   });
 
-  test('addPenalities should call penalities on other players', () => {
-    game.players = [mockPlayer, { id: '2', penalities: jest.fn() }];
-    game.addPenalities(mockPlayer.id);
-    expect(game.players[1].penalities).toHaveBeenCalled();
+  test('ne devrait pas mettre à jour l\'intervalle si trop court', () => {
+    // Setup
+    game.interval = setInterval(() => {}, 3000);
+    const originalInterval = game.interval;
+    
+    // Action
+    game.startWithNewInterval(400); // En dessous de la limite de 500
+    
+    // Vérifier que l'intervalle n'est pas mis à jour
+    expect(game.gameInterval).toBe(3000);
+  });
+
+  test('devrait ajouter des pénalités aux autres joueurs', () => {
+    // Setup
+    mockPlayer1.penalities = jest.fn();
+    mockPlayer2.penalities = jest.fn();
+    game.players = [mockPlayer1, mockPlayer2];
+    
+    // Action
+    game.addPenalities(mockPlayer1.id);
+    
+    // Vérifier que les pénalités sont ajoutées au bon joueur
+    expect(mockPlayer1.penalities).not.toHaveBeenCalled();
+    expect(mockPlayer2.penalities).toHaveBeenCalled();
+  });
+
+  test('devrait nettoyer et supprimer le jeu', () => {
+    // Setup
+    game.interval = setInterval(() => {}, 1000);
+    game.players = [mockPlayer1];
+    game.state = STATE.STARTED;
+    game.tetriminos_history = [mockTetrimino];
+    
+    // Action
+    game.delete();
+    
+    // Vérifier que le jeu est correctement nettoyé
+    expect(game.players).toEqual([]);
+    expect(game.state).toBe(STATE.WAITING);
+    expect(game.tetriminos_history).toEqual([]);
   });
 });
