@@ -1,5 +1,5 @@
 import { setAdminId, setPlayers, setRoomName, setRoomsList, setUserId } from './roomInfoSlice';
-import { connect, setRoomError, reset, updateRoom, setPseudoError } from './socketSlice';
+import { connect, setRoomError, reset, updateRoom, setPseudoError, setDeadPlayer } from './socketSlice';
 import io from 'socket.io-client';
 
 const SERVER_URL = 'http://localhost:4000';
@@ -41,6 +41,16 @@ const middleware = (store) => (next) => async (action) => {
         socket.on('pseudoError', (data) => {
           console.log('Pseudo ERROR:', data.message);
           store.dispatch(setPseudoError(true));
+        });
+
+        socket.on('gameFinished ', (data) => {
+          //TODO
+          //store.dispatch(reset());
+        });
+
+        socket.on('finished', (data) => {
+          // add data.idPlayer to the list of dead players
+          store.dispatch(setDeadPlayer(data));
         });
       }
       break;

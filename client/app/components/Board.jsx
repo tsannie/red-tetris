@@ -1,7 +1,7 @@
 import React from 'react';
 import Cell from './Cell';
 
-const Board = ({ board_value, size = 'normal' }) => {
+const Board = ({ board_value, size = 'normal', isDarkened = false }) => {
   const sizeMap = {
     big: 'clamp(0.7rem, 4vh, 4.5rem)',
     normal: 'clamp(0.7rem, 3vh, 2.5rem)',
@@ -18,7 +18,7 @@ const Board = ({ board_value, size = 'normal' }) => {
 
   return (
     <div
-      className={`grid gap-0 border-black overflow-hidden ${sizeBorderMap[size]}`}
+      className={`grid gap-0 border-black overflow-hidden ${sizeBorderMap[size]} ${isDarkened ? 'bg-black/80' : ''}`}
       style={{
         gridTemplateColumns: `repeat(${board_value[0].length}, ${cellSize})`,
         gridTemplateRows: `repeat(${board_value.length}, ${cellSize})`,

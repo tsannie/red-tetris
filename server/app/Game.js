@@ -65,6 +65,7 @@ class Game {
       .filter((otherPlayer) => otherPlayer !== player)
       .map((otherPlayer) => ({
         pseudo: otherPlayer.pseudo,
+        id: otherPlayer.id,
         state: otherPlayer.state,
         grid: otherPlayer.board.grid,
       }));

@@ -9,6 +9,7 @@ const initialState = {
   next: [],
   current: [],
   otherPlayers: [],
+  deadPlayer: [],
 };
 
 export const connectionAttempt = createAction('socket/connectionAttempt');
@@ -46,6 +47,7 @@ const socketSlice = createSlice({
       state.next = [];
       state.current = [];
       state.otherPlayers = [];
+      state.deadPlayer = [];
     },
     setRoomError: (state, { payload }) => {
       state.roomError = payload;
@@ -53,10 +55,15 @@ const socketSlice = createSlice({
     setPseudoError: (state, { payload }) => {
       state.pseudoError = payload;
     },
+    setDeadPlayer: (state, { payload }) => {
+      const playerId = payload.idPlayer;
+      state.deadPlayer.push(playerId);
+    },
   },
 });
 
-export const { connect, disconnect, updateRoom, reset, setRoomError, setPseudoError } = socketSlice.actions;
+export const { connect, disconnect, updateRoom, reset, setRoomError, setPseudoError, setDeadPlayer } =
+  socketSlice.actions;
 
 export const selectIsConnected = (state) => state.socket.socketConnected;
 
