@@ -67,7 +67,7 @@ describe('Player', () => {
     expect(player.pseudo).toBe('testPlayer');
     expect(player.socket).toBe(mockSocket);
     expect(player.n_tetriminos).toBe(0);
-    expect(player.state).toBe(STATE.FINISHED);
+    expect(player.state).toBe(STATE.WAITING);
   });
 
   test('move returns false when state is not STARTED', () => {
