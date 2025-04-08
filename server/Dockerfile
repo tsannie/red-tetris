@@ -3,18 +3,16 @@ FROM node:20 AS base
 WORKDIR /app
 COPY package*.json ./
 
-
 # Dev image
 FROM base AS development
 RUN npm install
 COPY . .
-EXPOSE 5173
+EXPOSE 4000
 CMD ["npm", "run", "dev"]
 
 # Prod image
 FROM base AS production
-RUN npm install
+RUN npm install --omit=dev
 COPY . .
-RUN npm run build
-EXPOSE 4173
-CMD ["npm", "run", "start"]
+EXPOSE 4000
+CMD ["npm", "start"]

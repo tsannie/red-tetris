@@ -10,6 +10,7 @@ const io = new Server(server, {
   cors: {
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
+    // edit for each route starting with /socket.io
   },
 });
 const gameServer = new GameServer();
@@ -98,4 +99,8 @@ io.on('connect', (socket) => {
 
 server.listen(4000, () => {
   console.log('Socket.io server running on port 4000');
+});
+
+app.get('/health', (_, res) => {
+  res.send('ok');
 });
