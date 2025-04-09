@@ -17,12 +17,6 @@ Red Tetris is a multiplayer Tetris game. The game can be played solo or with mul
 
 ## 📦 Installation
 
-Trop bien si tout tourne ! Voici une section **Installation** simple et claire en anglais pour ton `README.md` 🔧
-
----
-
-## 🚀 Installation
-
 ### Development
 
 ```bash
