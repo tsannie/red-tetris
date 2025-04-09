@@ -3,6 +3,15 @@ import http from 'http';
 import { Server } from 'socket.io';
 import GameServer from './app/GameServer.js';
 import { direction_vector, isValidName } from './app/utils.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
@@ -10,10 +19,25 @@ const io = new Server(server, {
   cors: {
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
-    // edit for each route starting with /socket.io
   },
 });
 const gameServer = new GameServer();
+
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, './public');
+
+  if (!fs.existsSync(clientBuildPath)) {
+    console.error('Client build folder does not exist');
+    process.exit(1);
+  }
+
+  app.use(express.static(clientBuildPath));
+
+  app.get('*', (_, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
+
 io.on('connect', (socket) => {
   let room = null;
   let player = null;
