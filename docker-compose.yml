@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   front:
     profiles: ['dev']
@@ -27,7 +25,6 @@ services:
     profiles: ['prod']
     build:
       context: .
-      dockerfile: Dockerfile
     ports:
       - '4000:4000'
     environment:
