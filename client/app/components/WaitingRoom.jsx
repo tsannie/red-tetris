@@ -28,7 +28,7 @@ const WaitingRoom = () => {
       <ExitButton />
       <div className="w-full h-screen grid grid-rows-[15%_70%_15%]">
         {/* Rooms Title */}
-        <div className="flex items-center justify-center text-7xl font-bold">{roomName}</div>
+        <div className="flex items-center justify-center text-7xl font-bold text-accent-bright">{roomName}</div>
 
         {/* Players List */}
         <div className="flex items-center justify-center">
@@ -36,8 +36,8 @@ const WaitingRoom = () => {
             {Array.from({ length: 5 }).map((_, index) => (
               <li
                 key={index}
-                className={`flex items-center justify-center rounded-lg w-64 h-16 text-2xl overflow-hidden bg-red-950 ${
-                  players[index]?.id === lastWinnerId ? 'text-yellow-500' : ''
+                className={`flex items-center justify-center rounded-lg w-64 h-16 text-2xl overflow-hidden bg-surface border-2 border-edge ${
+                  players[index]?.id === lastWinnerId ? 'text-piece-yellow' : players[index] ? 'text-ink' : 'text-muted'
                 }`}
               >
                 {players[index] ? players[index].username : '...'}
@@ -50,7 +50,7 @@ const WaitingRoom = () => {
         <div className="flex items-center justify-center">
           {user_id === admin_id && (
             <button
-              className="px-6 py-3 bg-red-500 hover:bg-red-950 rounded-lg shadow-md text-2xl mr-4"
+              className="px-6 py-3 rounded-lg shadow-md text-2xl mr-4 bg-accent text-white hover:bg-accent-hi disabled:bg-off disabled:text-muted transition-colors"
               onClick={handleStartGame}
             >
               Start Game

@@ -42,7 +42,7 @@ export function Layout({ children }) {
       </head>
       <body>
         <Provider store={store}>
-          <main className="bg-red-800 min-h-screen">
+          <main className="bg-base text-ink min-h-screen">
             {children}
             <ScrollRestoration />
             <Scripts />
@@ -119,7 +119,7 @@ export default function App() {
   }, []);
 
   if (!socketConnected || !checkRedirect) {
-    return <div>Connecting...</div>;
+    return <div className="flex items-center justify-center min-h-screen text-muted">Connecting...</div>;
   } else {
     return <Outlet />;
   }

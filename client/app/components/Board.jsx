@@ -9,16 +9,16 @@ const Board = ({ board_value, size = 'normal', isDarkened = false }) => {
   };
 
   const sizeBorderMap = {
-    big: 'border-4',
-    normal: 'border-0', // preview current/next game
-    small: 'border-2',
+    big: 'border-4 border-edge',
+    normal: 'border-0', // preview current/next
+    small: 'border-2 border-edge',
   };
 
   const cellSize = sizeMap[size] || sizeMap.normal;
 
   return (
     <div
-      className={`grid gap-0 border-black overflow-hidden ${sizeBorderMap[size]} ${isDarkened ? 'bg-black/80' : ''}`}
+      className={`relative grid gap-0 overflow-hidden ${sizeBorderMap[size]}`}
       style={{
         gridTemplateColumns: `repeat(${board_value[0].length}, ${cellSize})`,
         gridTemplateRows: `repeat(${board_value.length}, ${cellSize})`,
@@ -27,6 +27,7 @@ const Board = ({ board_value, size = 'normal', isDarkened = false }) => {
       {board_value.flat().map((cell, index) => (
         <Cell key={index} cell_value={cell} />
       ))}
+      {isDarkened && <div className="absolute inset-0 bg-black/70" />}
     </div>
   );
 };

@@ -86,7 +86,7 @@ const Game = () => {
               <Board board_value={board} size="big" isDarkened={deadPlayer.includes(user_id)} />
             </div>
             <div className="flex flex-col justify-around items-center overflow-hidden w-md h-full max-h-[1500px]">
-              <div className="grid grid-cols-2 items-center justify-around border-4 border-white w-full p-4 min-h-[25vh]">
+              <div className="grid grid-cols-2 items-center justify-around border-2 border-edge bg-surface rounded-lg w-full p-4 min-h-[25vh]">
                 <TetriminoDisplayBox tetrimino={current} title="Current" />
                 <TetriminoDisplayBox tetrimino={next} title="Next" />
               </div>

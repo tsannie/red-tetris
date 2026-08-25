@@ -11,15 +11,49 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
     'Noto Color Emoji';
   --font-arcade: 'ArcadeAlternate', sans-serif;
+
+  --color-base: #0b0b0f;
+  --color-surface: #16161d;
+  --color-field: #101017;
+
+  --color-edge: #6b6b85;
+  --color-gridline: #2e2e3c;
+
+  --color-ink: #ededf2;
+  --color-muted: #a1a1b5;
+
+  --color-accent: #cc0009;
+  --color-accent-hi: #e7000b;
+  --color-accent-bright: #fb2c36;
+  --color-off: #2a2a36;
+
+  --color-penalty: #70708c;
+  --color-piece-cyan: #22d3ee;
+  --color-piece-blue: #51a2ff;
+  --color-piece-orange: #ff8904;
+  --color-piece-yellow: #fdc700;
+  --color-piece-green: #05df72;
+  --color-piece-purple: #c27aff;
+  --color-piece-red: #ff6467;
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950 font-sans;
+  @apply bg-base text-ink;
   font-family: var(--font-arcade);
   font-size: 20px;
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+  color-scheme: dark;
+}
+
+input {
+  @apply bg-surface text-ink border-2 border-edge rounded-lg;
+
+  &::placeholder {
+    @apply text-muted;
+  }
+
+  &:focus {
+    @apply outline-none border-accent-hi;
   }
 }
 

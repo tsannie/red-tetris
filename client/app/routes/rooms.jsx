@@ -28,13 +28,13 @@ const Rooms = () => {
     // grid with 20 / 50 / 30 layout
     <div className="p-4 grid place-items-center grid-rows-[20%_50%_30%] h-screen">
       <div className="header w-full flex flex-col items-center justify-center">
-        <div className="flex items-center justify-center text-7xl font-bold">Room Selection</div>
-        <p className="mb-4 text-3xl">Welcome {username}</p>
+        <div className="flex items-center justify-center text-7xl font-bold text-accent-bright">Room Selection</div>
+        <p className="mb-4 text-3xl text-muted">Welcome {username}</p>
       </div>
       {roomsList.length !== 0 ? (
         <RoomTable roomsList={roomsList} onSelect={handleSelectRoom} />
       ) : (
-        <p className="text-2xl">No rooms available</p>
+        <p className="text-2xl text-muted">No rooms available</p>
       )}
       <CreationRoom handleSelectRoom={handleSelectRoom} />
     </div>

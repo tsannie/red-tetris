@@ -41,17 +41,17 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
-        <h2 className="text-3xl mb-4">Your name</h2>
+        <h2 className="text-3xl mb-4 text-accent-bright">Your name</h2>
         <form onSubmit={handleLogin}>
           <input
             type="text"
             placeholder="Enter your pseudo"
             value={pseudoInput}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+            className="w-full p-2"
           />
           <button
-            className="mt-4 w-full px-4 py-2 bg-red-500 rounded-lg hover:bg-red-950 disabled:bg-red-400"
+            className="mt-4 w-full px-4 py-2 rounded-lg bg-accent text-white hover:bg-accent-hi disabled:bg-off disabled:text-muted transition-colors"
             disabled={!isValidName(pseudoInput)}
           >
             Log in
